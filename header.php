@@ -86,7 +86,7 @@ include 'functions.php';
                     <div class="navbar-custom">
 			<ul style="max-height:70px;" class="list-unstyled topbar-right-menu float-right mb-0">
 			 <li class="dropdown notification-list">
-                           <a class="<?php if ($site_settings['override'] != 'resume'){ echo 'rubberBand animated infinite';}?> nav-link dropdown-toggle arrow-none" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                           <a class="<?php if ($site_settings['light_override'] != 'resume'){ echo 'rubberBand animated infinite';}?> nav-link dropdown-toggle arrow-none" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
 			    <i id="light" title="Light Status" class="mdi mdi-lightbulb-on-outline noti-icon"></i>
 			   </a>
                         <?php

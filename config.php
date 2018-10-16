@@ -21,24 +21,19 @@ $conn->query("SET names UTF8");
 // Get Settings Data
 $setSql = "
           SELECT
-                woeid,
                 python_update,
-                make_cloudy,
-                log_file,
-                on_time,
-                off_time,
                 dashboard_update,
                 tz,
 		graphLimit,
 		api_key,
 		performAction,
-		weatherStatus,
 		pumpStatus,
 		lightStatus,
 		username,
 		user_password,
 		sessionId,
-		override,
+		light_override,
+		pump_override,
 		tempScale
           FROM
                 settings
