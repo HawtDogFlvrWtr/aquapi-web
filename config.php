@@ -1,7 +1,7 @@
 <?php
 
 if(!defined('INCLUDE_CHECK')) die('You are not allowed to execute this file directly');
-
+#date_default_timezone_set('America/New_York');
 
 /* Database config */
 
@@ -34,7 +34,8 @@ $setSql = "
 		sessionId,
 		light_override,
 		pump_override,
-		tempScale
+		tempScale,
+		version
           FROM
                 settings
 ";
