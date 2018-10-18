@@ -69,6 +69,25 @@
                                   setInterval(captureDevices, 5000);
                                   captureDevices();
 		
+                                  function captureOutlets() {
+				    $("[id^=outlet-icon]").each(function(index) {
+					    var outletName = $(this).children('i').attr('id');
+	                                    $.get(`api/outletStatus.php?module=${outletName}`, function (data) {
+				    	      if (data == 1) {
+	                	                $(`#${outletName}`).addClass('text-warning');
+						$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-0`);
+						$(`#${outletName}`).prop('title','Outlet On');
+					      } else {
+	                	                $(`#${outletName}`).addClass('text-secondary');
+						$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-1`);
+						$(`#${outletName}`).prop('title','Outlet Off');
+					      }
+					    });
+				    });
+                                  }
+                                  setInterval(captureOutlets, 2000);
+                                  captureOutlets();
+
 				  function getQueryVariable(variable) {
 				    var query = window.location.search.substring(1);
 				    var vars = query.split("&");

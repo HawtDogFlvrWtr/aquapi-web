@@ -102,5 +102,26 @@ if (isset($_GET['override'])) {
   header("Location: dashboard.php");
   exit();
 }
-#var_dump($_SESSION);
+# Changing port status
+if (isset($_GET['outlet-change']))  {
+	$outletChange = $conn->real_escape_string($_GET['outlet-change']);
+	$splitVal = explode("-", $outletChange);
+	$module = $splitVal[0];
+	$outlet = $splitVal[1];
+	$command = $splitVal[2];
+	if ($command == 1) {
+		$command = 'on';
+	} else {
+		$command = 'off';
+	}
+	$getIP = $conn->query("SELECT moduleSerial, moduleAddress FROM module_entries WHERE id = ".$module);
+	$ipAddress = $getIP->fetch_array();
+	if (file_get_contents("http://".$ipAddress['moduleAddress']."/".$outlet."/".$command) !== FALSE) {
+		msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." was turned ".$command." successfully.", "success");	
+	} else {
+		msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." failed to turn ".$command." successfully.", "danger");
+	}
+	header("Location: outlets.php");
+	exit();
+}
 ?>
