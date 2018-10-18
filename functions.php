@@ -68,18 +68,6 @@ if (isset($_POST['single-metric-value']) && isset($_POST['smetric-type'])) {
   header("Location: dashboard.php");
   exit();
 }
-$singleMetric = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
-$parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
-$graphs = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
-$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
-$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
-$lightMenuOverrideList = $conn->query("SELECT * from light_override ORDER BY type");
-$pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type");
-$moduleEntries = $conn->query("SELECT module_entries.id, moduleSerial, moduleFirmware, moduleNote, epoch, moduleTypeName, featureCount, moduleAddress, moduleColor from module_entries LEFT JOIN module_types on module_entries.moduleType = module_types.id");
-#$outletTypes = $conn->query("SELECT * from outlet_types");
-#$outletEntries = $conn->query("SELECT * from outlet_entries");
-#$outletEntries = $conn->query("SELECT moduleId, outletType, offDuringFeeding, outletStatus, alwaysOn, outletNote, outletTriggerValue, outletTriggerParam, outletTriggerTest, moduleType, moduleSerial, moduleTypeName, moduleNote FROM outlet_entries oe LEFT JOIN module_entries me on oe.moduleId = me.id LEFT JOIN module_types mt on me.moduleType = mt.id");
-
 # Store alets
 function msgBoxDisplay() {
   echo $_SESSION[$sessionId]['msgBox'];
@@ -102,26 +90,44 @@ if (isset($_GET['override'])) {
   header("Location: dashboard.php");
   exit();
 }
-# Changing port status
-if (isset($_GET['outlet-change']))  {
-	$outletChange = $conn->real_escape_string($_GET['outlet-change']);
-	$splitVal = explode("-", $outletChange);
-	$module = $splitVal[0];
-	$outlet = $splitVal[1];
-	$command = $splitVal[2];
-	if ($command == 1) {
-		$command = 'on';
-	} else {
-		$command = 'off';
+
+# Run for all pages
+$lightMenuOverrideList = $conn->query("SELECT * from light_override ORDER BY type");
+$pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type");
+
+# Only run on dashboard.php 
+ if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false) {
+	$singleMetric = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
+	$parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
+	$graphs = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
+	$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
+	$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
+ }
+
+# Only run on outlets.php 
+if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
+	# Changing port status
+	$moduleEntries = $conn->query("SELECT module_entries.id, moduleSerial, moduleFirmware, moduleNote, epoch, moduleTypeName, featureCount, moduleAddress, moduleColor from module_entries LEFT JOIN module_types on module_entries.moduleType = module_types.id");
+	if (isset($_GET['outlet-change']))  {
+		$outletChange = $conn->real_escape_string($_GET['outlet-change']);
+		$splitVal = explode("-", $outletChange);
+		$module = $splitVal[0];
+		$outlet = $splitVal[1];
+		$command = $splitVal[2];
+		if ($command == 1) {
+			$command = 'on';
+		} else {
+			$command = 'off';
+		}
+		$getIP = $conn->query("SELECT moduleSerial, moduleAddress FROM module_entries WHERE id = ".$module);
+		$ipAddress = $getIP->fetch_array();
+		if (file_get_contents("http://".$ipAddress['moduleAddress']."/".$outlet."/".$command) !== FALSE) {
+			msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." was turned ".$command." successfully.", "success");	
+		} else {
+			msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." failed to turn ".$command." successfully.", "danger");
+		}
+		header("Location: outlets.php");
+		exit();
 	}
-	$getIP = $conn->query("SELECT moduleSerial, moduleAddress FROM module_entries WHERE id = ".$module);
-	$ipAddress = $getIP->fetch_array();
-	if (file_get_contents("http://".$ipAddress['moduleAddress']."/".$outlet."/".$command) !== FALSE) {
-		msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." was turned ".$command." successfully.", "success");	
-	} else {
-		msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." failed to turn ".$command." successfully.", "danger");
-	}
-	header("Location: outlets.php");
-	exit();
 }
 ?>
