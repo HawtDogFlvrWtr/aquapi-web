@@ -75,6 +75,10 @@ $maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
 $maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
 $lightMenuOverrideList = $conn->query("SELECT * from light_override ORDER BY type");
 $pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type");
+$moduleEntries = $conn->query("SELECT module_entries.id, moduleSerial, moduleFirmware, moduleNote, epoch, moduleTypeName, featureCount, moduleAddress, moduleColor from module_entries LEFT JOIN module_types on module_entries.moduleType = module_types.id");
+#$outletTypes = $conn->query("SELECT * from outlet_types");
+#$outletEntries = $conn->query("SELECT * from outlet_entries");
+#$outletEntries = $conn->query("SELECT moduleId, outletType, offDuringFeeding, outletStatus, alwaysOn, outletNote, outletTriggerValue, outletTriggerParam, outletTriggerTest, moduleType, moduleSerial, moduleTypeName, moduleNote FROM outlet_entries oe LEFT JOIN module_entries me on oe.moduleId = me.id LEFT JOIN module_types mt on me.moduleType = mt.id");
 
 # Store alets
 function msgBoxDisplay() {
