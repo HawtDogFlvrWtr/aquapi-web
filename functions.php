@@ -1,6 +1,11 @@
 <?php
 # Username Info
 session_start();
+if (isset($_GET['debug'])) {
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+}
 # This "if" must be first so login happens the first time
 if (isset($_POST['email']) && isset($_POST['password'])){
   if ($_POST['email'] == $site_settings['username'] ){
@@ -94,11 +99,11 @@ if (isset($_GET['override'])) {
 # Run for all pages
 $lightMenuOverrideList = $conn->query("SELECT * from light_override ORDER BY type");
 $pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type");
+$parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
 
 # Only run on dashboard.php 
  if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false) {
 	$singleMetric = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
-	$parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
 	$graphs = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
 	$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
 	$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
@@ -106,6 +111,23 @@ $pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type"
 
 # Only run on outlets.php 
 if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
+	# Updating port configuration
+	if (isset($_POST['triggerParam']) && isset($_POST['triggerTest']) && isset($_POST['triggerValue']) && isset($_POST['triggerCommand']) && isset($_POST['outletType']) && isset($_POST['outletNote']) && isset($_POST['outletId'])){
+		$triggerParam = $conn->real_escape_string($_POST['triggerParam']);
+		$triggerTest = $conn->real_escape_string($_POST['triggerTest']);
+		$triggerValue = $conn->real_escape_string($_POST['triggerValue']);
+		$triggerCommand = $conn->real_escape_string($_POST['triggerCommand']);
+		$outletType = $conn->real_escape_string($_POST['outletType']);
+		$outletNote = $conn->real_escape_string($_POST['outletNote']);
+		$outletId = $conn->real_escape_string($_POST['outletId']);
+		$outletIdSplit = explode("-",$outletId);
+		$pushUpdate = $conn->query("UPDATE outlet_entries SET outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
+		msgBox("Outlet configuration was saved successfully.", "success");
+		header("Location: outlets.php");
+		exit();
+
+
+	}
 	# Changing port status
 	$moduleEntries = $conn->query("SELECT module_entries.id, moduleSerial, moduleFirmware, moduleNote, epoch, moduleTypeName, featureCount, moduleAddress, moduleColor from module_entries LEFT JOIN module_types on module_entries.moduleType = module_types.id");
 	if (isset($_GET['outlet-change']))  {
@@ -122,7 +144,7 @@ if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
 		$getIP = $conn->query("SELECT moduleSerial, moduleAddress FROM module_entries WHERE id = ".$module);
 		$ipAddress = $getIP->fetch_array();
 		if (file_get_contents("http://".$ipAddress['moduleAddress']."/".$outlet."/".$command) !== FALSE) {
-			msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." was turned ".$command." successfully.", "success");	
+			msgBox("Command successful. It may take a moment to register with the site.", "success");	
 		} else {
 			msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." failed to turn ".$command." successfully.", "danger");
 		}

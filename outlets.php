@@ -1,5 +1,6 @@
 <?php
 include 'header.php';
+$parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
 ?>                    
                     <!-- Start Content-->
                     <div class="container-fluid">
@@ -13,71 +14,133 @@ include 'header.php';
                             </div>
                         </div>
                         <!-- end page title -->
+			<div class="row">
  			<?php
 				while($row = $moduleEntries->fetch_assoc()) {
 					$portInfo = $conn->query("SELECT * FROM outlet_entries WHERE moduleId = ".$row['id']);
 			?>
-			<div id="<?php echo $row['id'];?>" class="row">
-                            <div class="col-5">
+                            <div class="col-lg-12">
 			    <div class="card bg-<?php echo $row['moduleColor'];?> bg-warning widget-flat">
 				    <div class="card-body">
 					    <h5 class="text-white font-weight-normal mt-0"><?php echo $row['moduleTypeName']?> (<?php echo $row['moduleSerial']?>)</h5>
-					    <p class="mb-0 text-white">
-						<strong class="font-13 text-nowrap">Firmware:</strong> <?php echo $row['moduleFirmware'];?>
-						<strong class="font-13 text-nowrap">IP:</strong> <?php echo $row['moduleAddress'];?>
-					    </p>
-				    </div>
-                                </div>
-                            </div>
-			</div>
 				<div class="row">
  				<?php
 				while($portRow = $portInfo->fetch_assoc()) {
-					if ($portRow['outletStatus'] == 0) {
-						$command = "on";
+					$portDetails = $conn->query("SELECT * FROM outlet_types WHERE id = ".$portRow['outletType']);
+					$portDetailsAssoc = $portDetails->fetch_assoc();
+					if ($portDetailsAssoc['id'] != 0) {
+						$icon = $portDetailsAssoc['typeIcon'];
 					} else {
-						$command = "off";
+						$icon = $portRow['outletIcon'];
+					}
+					if ($portRow['outletNote'] == "") {
+						if ($portDetailsAssoc['outletType'] != "") {
+							$note = $portDetailsAssoc['outletType'];
+						} else {
+							$note = "None";
+						}
+					} else {
+						$note = $portRow['outletNote'];
 					}
 
 				?>
                                     <div class="col-lg-2">
 				    <div class="card widget-flat text-center">
 					    <div class="card-body">
-<!--						<h5 id="outlet-title" class="text-muted font-weight-normal mt-0" title="Outlet port <?php echo $portRow['portNumber'] ?>">Outlet <?php echo $portRow['portNumber'] ?></h5>-->
 						<div class="text-muted dropdown float-right">
 						    <a id="<?php echo $portRow['portNumber'];?>" href="#" class="card-drop" data-toggle="modal" data-target="#outlet<?php echo $portRow['moduleId'];?>-port<?php echo $portRow['portNumber'];?>" aria-expanded="false">
         	                                        <i title="Configure Outlet" class="mdi mdi-settings"></i>
                 	                            </a>
 						</div>
+						<div class="mt-3">
 						<p id="outlet-divider<?php echo $portRow['portNumber'] ?>" class="display-4 mt-1 mb-1"></p>
-						<a id="outlet-icon-<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" href="updating...">
-							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-1 mdi <?php echo $portRow['outletIcon'];?>"></i>
+						<a id="outlet-icon-<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" href="#">
+							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-1 mdi <?php echo $icon;?>"></i>
+						
 						</a>
-<!--
-						<p id="outlet-status-<?php echo $portRow['portNumber'] ?>" class="text-center">
-							<input type="checkbox" id="outlet<?php echo $portRow['moduleId'];?>-port<?php echo $portRow['portNumber'];?>" checked="" data-switch="success">
-							<label for="outlet<?php echo $portRow['moduleId'];?>-port<?php echo $portRow['portNumber'];?>" data-on-label="On" data-off-label="Off"></label>
-						</p>
--->
+						</div>
+							<h5><?php echo $note;?></h5>
                                             </div> <!-- end card-body-->
                                         </div> <!-- end card-->
 				    </div> <!-- end col-->
 					<div class="modal fade" id="outlet<?php echo $portRow['moduleId'];?>-port<?php echo $portRow['portNumber'];?>" tabindex="40" role="dialog" aria-labelledby="outlet<?php echo $portRow['moduleId'];?>-port<?php echo $portRow['portNumber'];?>" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                            <div class="modal-dialog modal-dialog-centered">
        	                                        <div class="modal-content">
                	                                    <div class="modal-header">
-                       	                                <h4 class="modal-title" id="outlet-<?php echo $portRow['portNumber'];?>">Port Settings</h4>
+						    <h4 class="modal-title" id="outlet-<?php echo $portRow['portNumber'];?>">Module <?php echo $portRow['moduleId'];?> Outlet <?php echo $portRow['portNumber'];?> Settings</h4>
                                	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                        	            </div>
                                                	    <div class="modal-body">
 							<form action="outlets.php" method="post">
 							  <div class="form-group mb-3">
-                                                		<div class="form-group mb-3">
-		                                                    <label>New value</label>
-                		                                    <input type="text" id="<?php echo $portRow['portNumber'];?>-single-metric-modal" name="single-metric-value" value="">
+								<div class="form-group mb-3">
+									<div class="card">
+									<div class="card-body bg-light">
+									<label for="example-select">IF THE <i class="mdi mdi-arrow-down"></i> </label>
+                                                			<select id="triggerParam" name="triggerParam" class="form-control">
+                                                    				<option></option>
+									<?php 
+										mysqli_data_seek($parameterList, 0);
+										while($pList = $parameterList->fetch_assoc()) {
+											if ($pList['id'] == $portRow['outletTriggerParam']) {
+												echo '<option selected value="'.$pList['id'].'">'.$pList['eventName'].'</option>';
+											} else {
+												echo '<option value="'.$pList['id'].'">'.$pList['eventName'].'</option>';
+											}
+										}
+									?>
+									</select>
+                                                			<select id="triggerTest" name="triggerTest" class="form-control">
+										<option></option>
+									<?php	
+										$possibleTests = array(">:Is greater than", "<:Is less than", "=:Equals", ">=:Is greater than or equal to", "<=:Is less than or equal to");
+										foreach ($possibleTests as $test) {
+											$testSplit = explode(":", $test);
+											if ($testSplit[0] == $portRow['outletTriggerTest']) {
+												echo '<option selected value="'.$testSplit[0].'">'.$testSplit[1].'</option>';
+											} else {
+												echo '<option value="'.$testSplit[0].'">'.$testSplit[1].'</option>';
+											}
+										}
+									?>
+									</select>
+								    <input class="mb-1 form-control" type="text" id="triggerValue" name="triggerValue" value="<?php echo $portRow['outletTriggerValue'];?>">
+
+									<label for="example-select">TURN THE OUTLET <i class="mdi mdi-arrow-down"></i></label>
+                                                			<select id="triggerCommand" name="triggerCommand" class="form-control">
+										<option></option>
+									<?php	
+										$possibleCommands = array("On", "Off",);
+										foreach ($possibleCommands as $key => $command) {
+											if ($command == $portRow['outletTriggerCommand']) {
+												echo '<option selected value="'.$command.'">'.$command.'</option>';
+											} else {
+												echo '<option value="'.$command.'">'.$command.'</option>';
+											}
+										}
+									?>
+									</select>
+									</div>
+									</div>
+									<label for="example-select">Outlet Type</label>
+                                                			<select id="outletType" name="outletType" class="form-control">
+										<option></option>
+									<?php
+										$outletTypes = $conn->query("SELECT id,outletType FROM outlet_types");	
+										while ($oRow = $outletTypes->fetch_assoc()) {
+											if ($oRow['id'] == $portRow['outletType']) {
+												echo '<option selected value="'.$oRow['id'].'">'.$oRow['outletType'].'</option>';
+											} else {
+												echo '<option value="'.$oRow['id'].'">'.$oRow['outletType'].'</option>';
+											}
+										}
+									?>
+									</select>
+		                                                    <label class="mt-1">Outlet Note</label>
+								    <input class="form-control" type="text" id="outletNote" name="outletNote" value="<?php echo $portRow['outletNote'];?>">
                                 		                </div>
-							    <input type="hidden" name="outlet-port" id="outlet-port" value="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>">
-							    <button id="submit" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
+							    <input type="hidden" name="outletId" id="outletId" value="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>">
+							    <button id="submit" type="submit" class="float-right btn btn-secondary mt-2 mb-2">Submit</button>
 							  </div>
 							</form>
                                                     </div>
@@ -86,9 +149,17 @@ include 'header.php';
                        	                </div><!-- /.modal -->
 				<?php } ?>
 				</div> <!-- end row -->
+					    <p class="mb-0 text-white">
+						<strong class="font-13 text-nowrap">Firmware:</strong> <?php echo $row['moduleFirmware'];?>
+						<strong class="font-13 text-nowrap">IP:</strong> <a target="_blank" href="http://<?php echo $row['moduleAddress'];?>"><?php echo $row['moduleAddress'];?></a>
+					    </p>
+				    </div>
+                                </div>
+                            </div>
 			<?php
 				}
 			?>
+			</div>
 
                             </div> <!-- end col -->
                         </div>
