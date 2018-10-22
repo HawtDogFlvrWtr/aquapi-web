@@ -170,7 +170,8 @@
 
                                   function captureCharts() {
                                     $('.card-body #chart-title').each(function(index) {
-                                            var metricName = $(this).html();
+					    var metricName = $(this).html();
+					    var metricColor = $(this).attr("color");
                                             var splitName = metricName.split(' ');
                                             var realName = splitName[0];
                                             $.get(`api/chartData.php?check=${realName}&limit=<?php echo $_SESSION[$sessionId]['limit'];?>`, function (data) {
@@ -209,12 +210,15 @@
                                                        data: {
                                                           labels: labels,
                                                           datasets: [{
-                                                                  fill: false,
+                                                                  fill: true,
                                                                   label: realName,
                                                                   data: values,
                                                                   pointRadius: 0,
-                                                                  pointBackgroundColor: '#fa5c7c',
-                                                                  borderColor: 'rgba(114, 124, 245, 1)',
+                                                                  pointBackgroundColor: metricColor,
+                                                                  //pointBackgroundColor: '#fa5c7c',
+                                                                  //borderColor: 'rgba(114, 124, 245, 1)',
+								  borderColor: metricColor,
+								  //backgroundColor: metricColor,
                                                                   borderWidth: 1
                                                                   //backgroundColor: 'rgba(108, 117, 125, 0.5)'
                                                           }]

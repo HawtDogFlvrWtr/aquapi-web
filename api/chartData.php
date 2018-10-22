@@ -9,10 +9,10 @@ if (isset($_GET['check'])) {
     if (strpos($limit, '-') !== false) {
       $limit = str_replace('-', ' ', $limit);
     } else {
-      $limit = "1 WEEK";
+      $limit = "3 MONTH";
     }
   } else {
-    $limit = "1 WEEK";
+    $limit = "3 MONTH";
   }
   if (stripos($limit, 'WEEK')) {
     $div = 3600;

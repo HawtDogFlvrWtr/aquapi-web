@@ -1,7 +1,6 @@
 <?php
 
 if(!defined('INCLUDE_CHECK')) die('You are not allowed to execute this file directly');
-#date_default_timezone_set('America/New_York');
 
 /* Database config */
 
@@ -17,6 +16,7 @@ $db_database		= 'aquapi';
 $conn = new mysqli($db_host,$db_user,$db_pass, $db_database) or die('Unable to establish a DB connection');
 
 $conn->query("SET names UTF8");
+$conn->query("SET time_zone='+00:00';");  # Use the system settings that mysql is using
 
 // Get Settings Data
 $setSql = "
@@ -25,6 +25,7 @@ $setSql = "
                 dashboard_update,
                 tz,
 		graphLimit,
+		defaultGraphLimit,
 		api_key,
 		performAction,
 		pumpStatus,

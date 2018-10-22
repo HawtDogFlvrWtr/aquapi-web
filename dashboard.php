@@ -16,7 +16,7 @@ include 'header.php';
 						$graphLimitSplit = explode(":", $value);
 						# Set to 1 week if nothing is set
 						if (!isset($_SESSION[$sessionId]['limit'])) {
-						  $_SESSION[$sessionId]['limit'] = "1-week";
+						  $_SESSION[$sessionId]['limit'] = $site_settings['defaultGraphLimit'];
 						}
 						if ($_SESSION[$sessionId]['limit'] == $graphLimitSplit[0]) {
 				    		  echo '<option id="'.$key.'" selected value="'.$graphLimitSplit[0].'">'.$graphLimitSplit[1].'</option>';
@@ -48,7 +48,7 @@ include 'header.php';
                                         <div class="card widget-flat text-center">
                                             <div class="card-body">
 						<div class="dropdown float-right">
-	                                            <a id="<?php echo $metricName['eventName'];?>" href="#" class="card-drop" data-toggle="modal" data-target="#smetric<?php echo $metricName['eventName'];?>" aria-expanded="false">
+						    <a id="<?php echo $metricName['eventName'];?>" href="#" class="card-drop" data-toggle="modal" data-target="#smetric<?php echo $metricName['eventName'];?>" aria-expanded="false">
         	                                        <i class="mdi mdi-plus"></i>
                 	                            </a>
 						</div>
@@ -206,13 +206,13 @@ include 'header.php';
                         <div class="row">
  			    <?php
 			    while($row = $graphs->fetch_assoc()) {
-				    $query = $conn->query("SELECT eventName from parameter_types where id=".$row['type_id']);
+				    $query = $conn->query("SELECT lineColor,eventName from parameter_types where id=".$row['type_id']);
 				    $metricName = $query->fetch_array();
 			    ?>
                             <div class="col-xl-4">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h4 id="chart-title" class="header-title mb-4"><?php echo $metricName['eventName'];?> Chart</h4>
+					<h4 color="<?php echo $metricName['lineColor'];?>" id="chart-title" class="header-title mb-4"><?php echo $metricName['eventName'];?> Chart</h4>
                                         <div id="chart-<?php echo $metricName['eventName'];?>" class="mt-3 chartjs-chart" style="min-height: 150px;">
                                             <canvas id="line-chart-<?php echo $metricName['eventName'];?>"></canvas>
                                         </div>

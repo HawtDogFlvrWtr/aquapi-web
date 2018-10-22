@@ -11,7 +11,7 @@ if (isset($_GET['check'])) {
   $real_date = correctTZ($returnValue['timestamp'], $site_settings['tz']);
   # Correct for temperature
   if ($returnValue['id'] == 23) {
-    $returnValue['value'] = round($returnValue['value'], 2);
+    $returnValue['value'] = round($returnValue['value'], 1);
   }
   echo $returnValue['value'].",".$real_date.",".$returnValue['decimals'].",".$returnValue['step'];
 } elseif(isset($_GET['devices'])) {

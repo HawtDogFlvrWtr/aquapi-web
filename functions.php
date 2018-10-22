@@ -13,7 +13,7 @@ if (isset($_POST['email']) && isset($_POST['password'])){
       session_start();
       $_SESSION[$sessionId]['email'] = $site_settings['username'];
       $_SESSION[$sessionId]['msgBox'] = "";
-      $_SESSION[$sessionId]['limit'] = "1-week";
+      $_SESSION[$sessionId]['limit'] = $site_settings['defaultGraphLimit'];
     }
   }
 }
@@ -102,7 +102,7 @@ $pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type"
 $parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
 
 # Only run on dashboard.php 
- if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false) {
+ if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false || strpos($_SERVER['PHP_SELF'], 'guest') !== false) {
 	$singleMetric = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
 	$graphs = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
 	$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");

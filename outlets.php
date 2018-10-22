@@ -55,11 +55,11 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 						<div class="mt-3">
 						<p id="outlet-divider<?php echo $portRow['portNumber'] ?>" class="display-4 mt-1 mb-1"></p>
 						<a id="outlet-icon-<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" href="#">
-							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-1 mdi <?php echo $icon;?>"></i>
+							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-3 mdi <?php echo $icon;?>"></i>
 						
 						</a>
 						</div>
-							<h5><?php echo $note;?></h5>
+							<h6><?php echo $note;?></h6>
                                             </div> <!-- end card-body-->
                                         </div> <!-- end card-->
 				    </div> <!-- end col-->

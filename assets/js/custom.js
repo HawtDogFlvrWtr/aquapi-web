@@ -1,4 +1,4 @@
-                                $(document).ready(function() {
+		$(document).ready(function() {
                                   function captureCards() {
 				    $('.card-body #single-metric-title').each(function(index) {
 					    var metricName = $(this).html();
@@ -25,7 +25,16 @@
                                   function captureDevices() {
 				    $('.list-unstyled li').each(function(index) {
 					    var metricName = $(this).children('a').children('i').attr('id');
-	                                    $.get(`api/singleValue.php?devices=${metricName}`, function (data) {
+					    if (metricName == 'Temperature') {
+						var apiHit = 'check';
+					    } else {
+						var apiHit = 'devices';
+					    }
+	                                    $.get(`api/singleValue.php?${apiHit}=${metricName}`, function (data) {
+					      if (metricName == 'Temperature') {
+						var splitTemp = data.split(',')
+						$(`#${metricName}`).text(splitTemp[0]).append("&#176;"); 
+					      }
 					      if (metricName == 'light') {
 						if (data == 1) {
 	                	                      	$(`#${metricName}`).css({ "color": "#ffbc00"});
@@ -74,19 +83,31 @@
 					    var outletName = $(this).children('i').attr('id');
 	                                    $.get(`api/outletStatus.php?module=${outletName}`, function (data) {
 				    	      if (data == 1) {
-	                	                $(`#${outletName}`).addClass('text-success');
+	                	                $(`#${outletName}`).removeClass('text-secondary').addClass('text-success');
 						$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-0`);
 						$(`#${outletName}`).prop('title','Outlet On');
 					      } else {
-	                	                $(`#${outletName}`).addClass('text-secondary');
+	                	                $(`#${outletName}`).removeClass('text-success').addClass('text-secondary');
 						$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-1`);
 						$(`#${outletName}`).prop('title','Outlet Off');
 					      }
 					    });
 				    });
                                   }
-                                  setInterval(captureOutlets, 2000);
+                                  setInterval(function(){
+					var window_focus = true;
+					$(window).focus(function() {
+						window_focus = true;
+					});
+					$(window).blur(function() {
+						window_focus = false;
+					});
+                                        if(window_focus == true){
+                                             captureOutlets();
+                                        }
+                                  }, 2000)
                                   captureOutlets();
+
 
 				  function getQueryVariable(variable) {
 				    var query = window.location.search.substring(1);
@@ -101,4 +122,4 @@
 				  $(".alert").delay(5000).slideUp(200, function(){
 					$(this).alert('close');
 				  });
-                                });
+               });

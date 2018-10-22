@@ -10,7 +10,7 @@ include 'header.php';
                             <div class="col-12">
                                 <div class="page-title-box">
 				    <div class="page-title-right">
-					<form class="form-inline" action="index.php" method="get">
+					<form class="form-inline" action="guest.php" method="get">
 	                                  <select class="form-control" id="limit-select" name="limit">
 					  <?php 
 					    foreach ($graphLimit as $key => $value) { 
