@@ -1,23 +1,27 @@
 		$(document).ready(function() {
                                   function captureCards() {
-				    $('.card-body #single-metric-title').each(function(index) {
-					    var metricName = $(this).html();
-	                                    $.get(`api/singleValue.php?check=${metricName}`, function (data) {
-        	                              var splitData = data.split(',');
-                	                      $(`#${metricName}-single-metric`).text(splitData[0]);
-				  	      $(`#${metricName}-single-metric-modal`).TouchSpin({
-						    step: splitData[3],
-						    decimals: splitData[2],
-						    boostat: 5,
-						    maxboostedstep: 10
-				   	      });
-					      // Don't refresh modal if we're in it
-					      if(!$(`#smetric${metricName}`).hasClass('show')){
-                	                        $(`#${metricName}-single-metric-modal`).val(splitData[0]);
-					      }
-                        	              $(`#${metricName}-single-metric-date`).text(splitData[1]);
-                                	    });
-				    });
+	                                    $.getJSON(`api/singleValue.php?check`, function (json) {
+						for(var i = 0; i < json.length; i++) {
+							var obj = json[i];
+							var timestamp = obj.timestamp;
+							var value = obj.value;
+							var eventName = obj.eventName;
+							var decimal = obj.decimals;
+							var step = obj.step;
+        	        	                      $(`#${eventName}-single-metric`).text(value);
+					  	      $(`#${eventName}-single-metric-modal`).TouchSpin({
+							    step: step,
+							    decimals: decimal,
+							    boostat: 5,
+							    maxboostedstep: 10
+					   	      });
+					    	  // Don't refresh modal if we're in it
+						      if(!$(`#smetric${eventName}`).hasClass('show')){
+        	        	                        $(`#${eventName}-single-metric-modal`).val(value);
+						      }
+                        		              $(`#${eventName}-single-metric-date`).text(timestamp);
+                                	    	};
+				    	});
                                   }
                                   setInterval(captureCards, 10000);
                                   captureCards();
@@ -32,8 +36,9 @@
 					    }
 	                                    $.get(`api/singleValue.php?${apiHit}=${metricName}`, function (data) {
 					      if (metricName == 'Temperature') {
-						var splitTemp = data.split(',')
-						$(`#${metricName}`).text(splitTemp[0]).append("&#176;"); 
+						json = JSON.parse(data);
+						var temperature = json[0].value
+						$(`#${metricName}`).text(temperature).append("&#176;"); 
 					      }
 					      if (metricName == 'light') {
 						if (data == 1) {
@@ -78,35 +83,6 @@
                                   setInterval(captureDevices, 5000);
                                   captureDevices();
 		
-                                  function captureOutlets() {
-				    $("[id^=outlet-icon]").each(function(index) {
-					    var outletName = $(this).children('i').attr('id');
-	                                    $.get(`api/outletStatus.php?module=${outletName}`, function (data) {
-				    	      if (data == 1) {
-	                	                $(`#${outletName}`).removeClass('text-secondary').addClass('text-success');
-						$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-0`);
-						$(`#${outletName}`).prop('title','Outlet On');
-					      } else {
-	                	                $(`#${outletName}`).removeClass('text-success').addClass('text-secondary');
-						$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-1`);
-						$(`#${outletName}`).prop('title','Outlet Off');
-					      }
-					    });
-				    });
-                                  }
-                                  setInterval(function(){
-					var window_focus = true;
-					$(window).focus(function() {
-						window_focus = true;
-					});
-					$(window).blur(function() {
-						window_focus = false;
-					});
-                                        if(window_focus == true){
-                                             captureOutlets();
-                                        }
-                                  }, 2000)
-                                  captureOutlets();
 
 
 				  function getQueryVariable(variable) {

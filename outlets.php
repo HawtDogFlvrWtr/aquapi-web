@@ -14,16 +14,20 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                             </div>
                         </div>
                         <!-- end page title -->
-			<div class="row">
  			<?php
 				while($row = $moduleEntries->fetch_assoc()) {
 					$portInfo = $conn->query("SELECT * FROM outlet_entries WHERE moduleId = ".$row['id']);
-			?>
+?>
+			    <div class="row">
                             <div class="col-lg-12">
-			    <div class="card bg-<?php echo $row['moduleColor'];?> bg-warning widget-flat">
+			    <div class="card bg-<?php echo $row['moduleColor'];?> widget-flat">
 				    <div class="card-body">
-					    <h5 class="text-white font-weight-normal mt-0"><?php echo $row['moduleTypeName']?> (<?php echo $row['moduleSerial']?>)</h5>
-				<div class="row">
+				    <h5 class="text-white font-weight-normal mt-0"><?php echo $row['moduleTypeName']?> (<?php echo $row['moduleSerial']?>) Firmware: <?php echo $row['moduleFirmware'];?> <a class="float-right text-white" target="_blank" href="http://<?php echo $row['moduleAddress'];?>"><?php echo $row['moduleAddress'];?></a></h5>
+				    </div>
+                                </div>
+			    </div>
+			    </div>
+			    <div class="row">
  				<?php
 				while($portRow = $portInfo->fetch_assoc()) {
 					$portDetails = $conn->query("SELECT * FROM outlet_types WHERE id = ".$portRow['outletType']);
@@ -148,24 +152,18 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                	                            </div><!-- /.modal-dialog -->
                        	                </div><!-- /.modal -->
 				<?php } ?>
-				</div> <!-- end row -->
-					    <p class="mb-0 text-white">
-						<strong class="font-13 text-nowrap">Firmware:</strong> <?php echo $row['moduleFirmware'];?>
-						<strong class="font-13 text-nowrap">IP:</strong> <a target="_blank" href="http://<?php echo $row['moduleAddress'];?>"><?php echo $row['moduleAddress'];?></a>
-					    </p>
-				    </div>
-                                </div>
-                            </div>
+				</div> <!--  end row -->
 			<?php
 				}
 			?>
 			</div>
 
                             </div> <!-- end col -->
-                        </div>
                         <!-- end row -->
 
                     </div> <!-- container -->
 			<?php
 			  include 'footer.php';
 			?>
+		    <script src="assets/js/outlets.js"></script>
+

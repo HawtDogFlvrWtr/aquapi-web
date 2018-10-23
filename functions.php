@@ -18,7 +18,7 @@ if (isset($_POST['email']) && isset($_POST['password'])){
   }
 }
 $noLogin = array('login.php', 'guest.php', 'chartData.php', 'singleValue.php');
-$needLogin = array('dashboard.php');
+$needLogin = array('dashboard.php', 'outlets.php', 'calendar.php');
 if (in_array($currentPage, $needLogin)) {
   if (isset($_SESSION[$sessionId]['email'])) {
     if (!in_array($currentPage, $needLogin)) {

@@ -22,6 +22,9 @@ include 'functions.php';
         <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/animate.css" rel="stylesheet" type="text/css" />
+        <!-- third party css -->
+        <link href="assets/css/vendor/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+        <!-- third party css end -->
 
 
 
@@ -61,6 +64,12 @@ include 'functions.php';
                             <a href="outlets.php" class="side-nav-link">
                                 <i class="mdi mdi-power-socket-us"></i>
                                 <span> Outlets </span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="calendar.php" class="side-nav-link">
+                                <i class="mdi mdi-calendar"></i>
+                                <span> Calendar </span>
                             </a>
                         </li>
                         <li class="side-nav-item">

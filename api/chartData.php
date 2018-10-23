@@ -21,7 +21,7 @@ if (isset($_GET['check'])) {
   } elseif (stripos($limit, 'YEAR')){
     $div = 1209600;
   } elseif (stripos($limit, 'HOUR')){
-    $div = 300;
+    $div = 1;
   } else {
     $div = 1800;
   }

@@ -152,20 +152,17 @@
         <script src="assets/js/app.min.js"></script>
         
         <!-- third party js -->
-        <script src="assets/js/vendor/Chart.bundle.min.js"></script>
+	<script src="assets/js/vendor/Chart.bundle.min.js"></script>
+	<script src="assets/js/vendor/chartjs-plugin-annotation.min.js"></script>
+	<script src="assets/js/vendor/jquery-ui.min.js"></script>
+        <script src="assets/js/vendor/fullcalendar.min.js"></script>
+        <script src="assets/js/pages/demo.calendar.js"></script>
         <script src="assets/js/vendor/jquery-jvectormap-1.2.2.min.js"></script>
         <script src="assets/js/vendor/jquery-jvectormap-world-mill-en.js"></script>
         <!-- third party js ends -->
 	<!-- Custom javascript -->
 	<script>
 	$(document).ready(function(){
-	  var window_focus = true;
-	  $(window).focus(function() {
-	    window_focus = true;
-	  });
-	  $(window).blur(function() {
-	    window_focus = false;
-	  });
 
 
                                   function captureCharts() {
@@ -202,11 +199,22 @@
 		  				  	   mode: 'index',
 		  					   intersect: false,
 		  				         },
+						         //annotation: { 
+						         //  annotations: [{ 
+							 //    type: 'line', 
+  							 //    mode: 'horizontal',
+							 //    scaleID: 'y-axis-0',
+							 //    value: '78',
+							 //    borderColor: 'tomato',
+							 //    borderWidth: 1
+						  	 //  }],
+							 //  drawTime: "afterDraw"
+						         //},
                                                        },
 		  				       hover: {
 		  				 	 mode: 'nearest',
 		  					 intersect: true
-		  				       },
+	    					       },
                                                        data: {
                                                           labels: labels,
                                                           datasets: [{
@@ -222,7 +230,7 @@
                                                                   borderWidth: 1
                                                                   //backgroundColor: 'rgba(108, 117, 125, 0.5)'
                                                           }]
-                                                       }
+                                                       },
                                                   };
                                                   var chart = new Chart(ctx, config);
 						};
@@ -230,10 +238,17 @@
                                     });
                                   }
 				  setInterval(function(){
+	  				var window_focus = true;
+					  $(window).focus(function() {
+					    window_focus = true;
+					  });
+					  $(window).blur(function() {
+					    window_focus = false;
+					  });
 					if(window_focus == true){
 						captureCharts();
 					}
-				  }, 10000);
+				  }, 60000);
                                   captureCharts();
 	});
 	</script>

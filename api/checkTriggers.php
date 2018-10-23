@@ -13,19 +13,15 @@ $outletEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerT
 while ($row = $outletEntries->fetch_assoc()) {
 	if ($row['outletStatus'] == 0) {
 		$row['outletStatus'] = 'off';
-		$outletStatusInt = 0;
 	} else {
 		$row['outletStatus'] = 'on';
-		$outletStatusInt = 1;
 	}
 	$outletTriggerTest = $row['outletTriggerTest'];
 	$outletTriggerCommand = strtolower($row['outletTriggerCommand']);
 	if ($outletTriggerCommand == 'on') {
 		$outletTriggerCommandOpposite = 'off';
-		$outletStatusOppositeInt = 0;
 	} else {
 		$outletTriggerCommandOpposite = 'on';
-		$outletStatusOppositeInt = 1;
 	}
 	$outletTriggerParam = $row['outletTriggerParam'];
 	$outletTriggerValue = $row['outletTriggerValue'];
@@ -38,11 +34,13 @@ while ($row = $outletEntries->fetch_assoc()) {
 			echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n";
 			if ($row['outletStatus'] != $outletTriggerCommand) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommand);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
 			}
 		} else {
 			echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommandOpposite);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
 			}
 		}
 	} elseif ($outletTriggerTest == "<") {
@@ -50,24 +48,30 @@ while ($row = $outletEntries->fetch_assoc()) {
 			echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommand) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommand);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
 			}
 		} else {
 			echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommandOpposite);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
 			}
 		}
 
 	} elseif ($outletTriggerTest == ">=") {
 		if ($returnValue['value'] >= $outletTriggerValue) {
 			echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+			echo "INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", ".$outletTriggerCommand.")\n";
 			if ($row['outletStatus'] != $outletTriggerCommand) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommand);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
 			}
 		} else {
 			echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+			echo "INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", ".$outletTriggerCommandOpposite.")\n";
 			if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommandOpposite);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
 			}
 		}
 
@@ -76,11 +80,13 @@ while ($row = $outletEntries->fetch_assoc()) {
 			echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommand) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommand);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
 			}
 		} else {
 			echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommandOpposite);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
 			}
 		}
 
@@ -89,11 +95,13 @@ while ($row = $outletEntries->fetch_assoc()) {
 			echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommand) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommand);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
 			}
 		} else {
 			echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 			if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
 				file_get_contents("http://".$moduleInfoReturn['moduleAddress']."/".$row['portNumber']."/".$outletTriggerCommandOpposite);
+				$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
 			}
 		}
 
