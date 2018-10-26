@@ -49,7 +49,7 @@ include 'functions.php';
 			<?php
                         if ($currentPage != 'guest.php') {
                         ?>
-                            <a href="index.php" class="side-nav-link">
+                            <a href="dashboard.php" class="side-nav-link">
 			<?php } else { ?>
                             <a href="guest.php" class="side-nav-link">
 			<?php } ?>
