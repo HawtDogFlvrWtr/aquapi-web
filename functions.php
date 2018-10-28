@@ -6,6 +6,7 @@ if (isset($_GET['debug'])) {
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 }
+$calendarDate = date("Y-m-d h:i");
 # This "if" must be first so login happens the first time
 if (isset($_POST['email']) && isset($_POST['password'])){
   if ($_POST['email'] == $site_settings['username'] ){
@@ -52,27 +53,6 @@ function correctTZ($dateString, $tz) {
 }
 $graphLimit = explode(",", $site_settings['graphLimit']);
 
-# Adding a maintenance note
-if (isset($_POST['maintenance-note-textarea']) && isset($_POST['maintenance-type'])) {
-  $note = $conn->real_escape_string($_POST['maintenance-note-textarea']);
-  $type = $conn->real_escape_string($_POST['maintenance-type']);
-  $insertData = $conn->query("INSERT INTO `tankkeeping_entries` (`id`, `type_id`, `timestamp`, `note`) VALUES (NULL, '".intval($type)."', CURRENT_TIMESTAMP, '".$note."')");
-  msgBox("Entry has been added", "success");
-  header("Location: dashboard.php");
-  exit();
-}
-
-# Adding an existing single entry
-if (isset($_POST['single-metric-value']) && isset($_POST['smetric-type'])) {
-  foreach ($_POST['smetric-type'] as $selectedOption) {
-    $value = $conn->real_escape_string($_POST['single-metric-value']);
-    $type = $conn->real_escape_string($selectedOption);
-    $insertData = $conn->query("INSERT INTO `parameter_entries` (`id`, `type_id`, `timestamp`, `value`) VALUES (NULL, '".intval($type)."', CURRENT_TIMESTAMP, '".$value."')");
-  }
-  msgBox("Entry has been added", "success");
-  header("Location: dashboard.php");
-  exit();
-}
 # Store alets
 function msgBoxDisplay() {
   echo $_SESSION[$sessionId]['msgBox'];
@@ -152,4 +132,28 @@ if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
 		exit();
 	}
 }
+
+# ENTRY ADDITIONS
+# Adding a maintenance note
+if (isset($_POST['maintenance-note-textarea']) && isset($_POST['maintenance-type'])) {
+  $note = $conn->real_escape_string($_POST['maintenance-note-textarea']);
+  $type = $conn->real_escape_string($_POST['maintenance-type']);
+  $insertData = $conn->query("INSERT INTO `tankkeeping_entries` (`id`, `type_id`, `timestamp`, `note`) VALUES (NULL, '".intval($type)."', CURRENT_TIMESTAMP, '".$note."')");
+  msgBox("Entry has been added", "success");
+  header("Location: dashboard.php");
+  exit();
+}
+
+# Adding an existing single entry
+if (isset($_POST['single-metric-value']) && isset($_POST['single-metric-date']) && isset($_POST['smetric-type'])) {
+  foreach ($_POST['smetric-type'] as $selectedOption) {
+    $value = $conn->real_escape_string($_POST['single-metric-value']);
+    $type = $conn->real_escape_string($selectedOption);
+    $insertData = $conn->query("INSERT INTO `parameter_entries` (`id`, `type_id`, `timestamp`, `value`) VALUES (NULL, '".intval($type)."', CURRENT_TIMESTAMP, '".$value."')");
+  }
+  msgBox("Entry has been added", "success");
+  header("Location: dashboard.php");
+  exit();
+}
+#
 ?>

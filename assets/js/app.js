@@ -21842,7 +21842,7 @@ return jQuery;
         //default settings for options
         this.parentEl = 'body';
         this.element = $(element);
-        this.startDate = moment().startOf('day');
+	this.startDate = moment();
         this.endDate = moment().endOf('day');
         this.minDate = false;
         this.maxDate = false;

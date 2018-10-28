@@ -70,7 +70,12 @@ include 'header.php';
                                                	    <div class="modal-body">
 							<form action="dashboard.php" method="post">
 							  <div class="form-group mb-3">
-                                                		<div class="form-group mb-3">
+								<div class="form-group mb-3">
+								    <label>Date/Time</label>
+								    <input class="form-control date" type="text" id="dateInput" name="single-metric-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
+
+								</div>
+								<div class="form-group mb-3">
 		                                                    <label>New value</label>
                 		                                    <input type="text" id="<?php echo $metricName['eventName'];?>-single-metric-modal" name="single-metric-value" value="">
                                 		                </div>
@@ -97,11 +102,17 @@ include 'header.php';
        	                                        <div class="modal-content">
                	                                    <div class="modal-header">
                        	                                <h4 class="modal-title" id="add-metric">Add Reading</h4>
-                               	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                               	                        <button id="add-single-entry" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                        	            </div>
                                                	    <div class="modal-body">
 							<form action="dashboard.php" method="post">
 							  <div class="form-group mb-3">
+								<div class="form-group mb-3">
+								    <label>Date/Time</label>
+								    <input class="form-control date" type="text" id="dateInput" name="single-metric-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-auto-input-update="true" data-set-start-date="now" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
+
+
+								</div>
                                                 		<div class="form-group mb-3">
 								    <label>Reading type</label>
                                                 			<select name="smetric-type[]" class="input-sm form-control select2 select2-multiple" multiple="multiple" data-toggle="select2">
@@ -155,6 +166,11 @@ include 'header.php';
                                         	            </div>
                                                 	    <div class="modal-body">
 								<form action="dashboard.php" method="post">
+								  <div class="form-group mb-3">
+								    <label>Date/Time</label>
+								    <input class="form-control date" type="text" id="dateInput" name="maintenance-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
+
+								  </div>
 								  <div class="form-group mb-3">
 								    <label for="maintenance-note-textarea">Note</label>
 								    <textarea class="form-control" name="maintenance-note-textarea" id="maintenance-note-textarea" rows="5"></textarea>

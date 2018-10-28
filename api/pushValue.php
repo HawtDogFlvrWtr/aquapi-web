@@ -1,7 +1,5 @@
 <?php
 define('INCLUDE_CHECK',true);
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 include '../config.php';
 include '../functions.php';
@@ -9,6 +7,9 @@ if (isset($_GET['metric']) && isset($_GET['value'])) {
 	$metric = $conn->real_escape_string($_GET['metric']);
 	$value = $conn->real_escape_string($_GET['value']);
 	$query = $conn->query("SELECT id FROM parameter_types WHERE eventName='".$metric."'");
+	if ($metric == "Temperature") {
+		$value = $value * 9.0 / 5.0 + 32.0; # Convert to F
+	}
 	$typeID = $query->fetch_array();
 	$insertData = $conn->query("INSERT INTO parameter_entries (type_id,value) VALUES (".$typeID['id'].", ".$value.")");
 	  echo("Metric Added");
