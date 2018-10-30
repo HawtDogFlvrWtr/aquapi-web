@@ -18,15 +18,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 				while($row = $moduleEntries->fetch_assoc()) {
 					$portInfo = $conn->query("SELECT * FROM outlet_entries WHERE moduleId = ".$row['id']);
 ?>
-			    <div class="row">
-                            <div class="col-lg-12">
-			    <div class="card bg-<?php echo $row['moduleColor'];?> widget-flat">
-				    <div class="card-body">
-				    <h5 class="text-white font-weight-normal mt-0"><?php echo $row['moduleTypeName']?> (<?php echo $row['moduleSerial']?>) Firmware: <?php echo $row['moduleFirmware'];?> <a class="float-right text-white" target="_blank" href="http://<?php echo $row['moduleAddress'];?>"><?php echo $row['moduleAddress'];?></a></h5>
-				    </div>
-                                </div>
-			    </div>
-			    </div>
+				    <h4 class="font-weight-normal mt-0"><?php echo $row['moduleTypeName']?> (<?php echo $row['moduleSerial']?>) Firmware: <?php echo $row['moduleFirmware'];?> IP: <a class="" target="_blank" href="http://<?php echo $row['moduleAddress'];?>"><?php echo $row['moduleAddress'];?></a></h4>
 			    <div class="row">
  				<?php
 				while($portRow = $portInfo->fetch_assoc()) {

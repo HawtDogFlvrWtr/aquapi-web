@@ -163,7 +163,24 @@
 	<!-- Custom javascript -->
 	<script>
 	$(document).ready(function(){
+		function getHiddenProp() {
+			var prefixes = ['webkit', 'moz', 'ms', 'o'];
+			// if 'hidden' is natively supported just return it
+			if ('hidden' in document) return 'hidden';
 
+			// otherwise loop over all the known prefixes until we find one
+			for (var i = 0; i < prefixes.length; i++) {
+				if ((prefixes[i] + 'Hidden') in document)
+					return prefixes[i] + 'Hidden';
+			}
+			// otherwise it's not supported
+			return null;
+		}
+		function isHidden() {
+			var prop = getHiddenProp();
+			if (!prop) return false;
+			return document[prop];
+		}
 
                                   function captureCharts() {
                                     $('.card-body #chart-title').each(function(index) {
@@ -178,7 +195,6 @@
 						} else {
 							var count = 0;
 						}
-						//console.log(`${realName}` + count);
 						if (count <= 3) {
 						  $(document.getElementById("chart-"+realName)).html("<h6>There isn't enough chart information for the timerange you've selected. You can view the last recorded value above.</h6>");
 						} else {
@@ -193,7 +209,7 @@
                                                        type: 'line',
                                                        options: {
                                                          animation: {
-                                                           duration: 0
+                                                           duration: 2 
                                                          },
 		  				         tooltips: {
 		  				  	   mode: 'index',
@@ -202,11 +218,16 @@
 						         //annotation: { 
 						         //  annotations: [{ 
 							 //    type: 'line', 
-  							 //    mode: 'horizontal',
-							 //    scaleID: 'y-axis-0',
-							 //    value: '78',
+  							 //    mode: 'vertical',
+							 //    scaleID: 'x-axis-0',
+							 //    value: '10/29/18 04:40',
 							 //    borderColor: 'tomato',
-							 //    borderWidth: 1
+							 //    borderWidth: 1,
+							 //    label: {
+							 //    	content: "Outlet",
+							 //	enabled: true,
+							 //	position: "top"
+							 //    }
 						  	 //  }],
 							 //  drawTime: "afterDraw"
 						         //},
@@ -214,7 +235,7 @@
 		  				       hover: {
 		  				 	 mode: 'nearest',
 		  					 intersect: true
-	    					       },
+	  					       },
                                                        data: {
                                                           labels: labels,
                                                           datasets: [{
@@ -223,12 +244,8 @@
                                                                   data: values,
                                                                   pointRadius: 0,
                                                                   pointBackgroundColor: metricColor,
-                                                                  //pointBackgroundColor: '#fa5c7c',
-                                                                  //borderColor: 'rgba(114, 124, 245, 1)',
 								  borderColor: metricColor,
-								  //backgroundColor: metricColor,
                                                                   borderWidth: 1
-                                                                  //backgroundColor: 'rgba(108, 117, 125, 0.5)'
                                                           }]
                                                        },
                                                   };
@@ -238,14 +255,7 @@
                                     });
                                   }
 				  setInterval(function(){
-	  				var window_focus = true;
-					  $(window).focus(function() {
-					    window_focus = true;
-					  });
-					  $(window).blur(function() {
-					    window_focus = false;
-					  });
-					if(window_focus == true){
+					if(!isHidden()){
 						captureCharts();
 					}
 				  }, 60000);

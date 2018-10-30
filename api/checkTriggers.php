@@ -9,6 +9,20 @@ if (isset($_GET['debug'])) {
 include '/var/www/html/config.php';
 include '/var/www/html/functions.php';
 
+
+# Handle feed and always on
+$outletEntriesAO = $conn->query("SELECT * FROM outlet_entries WHERE alwaysOn = 1");
+while ($row = $outletEntriesAO->fetch_assoc()) {
+	$moduleInfoAO = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
+	$moduleInfoReturnAO = $moduleInfoAO->fetch_assoc();
+	if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
+		# Turn outlet on that's supposed to be on but isn't. This will help on first boot.
+		file_get_contents("http://".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."/on");
+		echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
+	}
+}
+
+# Handle trigger outlets
 $outletEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerTest != '' AND outletTriggerCommand != '' AND outletTriggerParam != 0 AND outletTriggerValue != 0");
 while ($row = $outletEntries->fetch_assoc()) {
 	if ($row['outletStatus'] == 0) {
@@ -105,6 +119,6 @@ while ($row = $outletEntries->fetch_assoc()) {
 			}
 		}
 
-	} 	
+	}
 }
 ?>

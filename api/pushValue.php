@@ -12,7 +12,7 @@ if (isset($_GET['metric']) && isset($_GET['value'])) {
 	}
 	$typeID = $query->fetch_array();
 	$insertData = $conn->query("INSERT INTO parameter_entries (type_id,value) VALUES (".$typeID['id'].", ".$value.")");
-	  echo("Metric Added");
+	echo("Metric Added");
 } elseif (isset($_GET['aquapip']) && isset($_GET['serial']) && isset($_GET['firmware']) && isset($_GET['address']) && isset($_GET['module']) && isset($_GET['status'])) {
 	$ipAddress = $conn->real_escape_string($_GET['address']);
 	$serial = $conn->real_escape_string($_GET['serial']);
