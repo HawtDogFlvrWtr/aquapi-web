@@ -61,9 +61,9 @@ include 'functions.php';
 			if ($currentPage != 'guest.php') {
 			?>
                         <li class="side-nav-item">
-                            <a href="outlets.php" class="side-nav-link">
+                            <a href="modules.php" class="side-nav-link">
                                 <i class="mdi mdi-power-socket-us"></i>
-                                <span> Outlets </span>
+                                <span> Modules </span>
                             </a>
                         </li>
                         <li class="side-nav-item">

@@ -8,11 +8,11 @@ function captureOutlets() {
 							var outletName = `${module}-${outlet}`;
 					    		if (outletStatus == 1) {
 	                		                	$(`#${outletName}`).removeClass('text-secondary').addClass('text-success');
-								$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-0`);
+								$(`#outlet-icon-${outletName}`).prop("href",`modules.php?outlet-change=${outletName}-0`);
 								$(`#${outletName}`).prop('title','Outlet On');
 							} else {
 			                	                $(`#${outletName}`).removeClass('text-success').addClass('text-secondary');
-								$(`#outlet-icon-${outletName}`).prop("href",`outlets.php?outlet-change=${outletName}-1`);
+								$(`#outlet-icon-${outletName}`).prop("href",`modules.php?outlet-change=${outletName}-1`);
 								$(`#${outletName}`).prop('title','Outlet Off');
 							}
 

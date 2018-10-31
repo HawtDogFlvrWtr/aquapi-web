@@ -9,7 +9,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box">
-                                    <h4 class="page-title">Outlets</h4>
+                                    <h4 class="page-title">Modules</h4>
                                 </div>
                             </div>
                         </div>
@@ -67,7 +67,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                                	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                        	            </div>
                                                	    <div class="modal-body">
-							<form action="outlets.php" method="post">
+							<form action="modules.php" method="post">
 							  <div class="form-group mb-3">
 								<div class="form-group mb-3">
 									<div class="card">

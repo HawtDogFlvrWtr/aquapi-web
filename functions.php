@@ -19,7 +19,7 @@ if (isset($_POST['email']) && isset($_POST['password'])){
   }
 }
 $noLogin = array('login.php', 'guest.php', 'chartData.php', 'singleValue.php');
-$needLogin = array('dashboard.php', 'outlets.php', 'calendar.php');
+$needLogin = array('dashboard.php', 'modules.php', 'calendar.php');
 if (in_array($currentPage, $needLogin)) {
   if (isset($_SESSION[$sessionId]['email'])) {
     if (!in_array($currentPage, $needLogin)) {
@@ -50,6 +50,11 @@ function correctTZ($dateString, $tz) {
   $real_date = new DateTime($dateString, new DateTimeZone('UTC'));
   $real_date->setTimeZone(new DateTimeZone($tz));
   return $real_date->format('m/d/y H:i');
+}
+function correctTZInsert($dateString, $tz) {
+  $real_date = new DateTime($dateString, new DateTimeZone($tz));
+  $real_date->setTimeZone(new DateTimeZone('UTC'));
+  return $real_date->format('y/m/d H:i:s');
 }
 $graphLimit = explode(",", $site_settings['graphLimit']);
 
@@ -89,8 +94,8 @@ $parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER B
 	$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
  }
 
-# Only run on outlets.php 
-if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
+# Only run on modules.php 
+if (strpos($_SERVER['PHP_SELF'], 'modules') !== false) {
 	# Updating port configuration
 	if (isset($_POST['triggerParam']) && isset($_POST['triggerTest']) && isset($_POST['triggerValue']) && isset($_POST['triggerCommand']) && isset($_POST['outletType']) && isset($_POST['outletNote']) && isset($_POST['outletId'])){
 		$triggerParam = $conn->real_escape_string($_POST['triggerParam']);
@@ -103,7 +108,7 @@ if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
 		$outletIdSplit = explode("-",$outletId);
 		$pushUpdate = $conn->query("UPDATE outlet_entries SET outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
 		msgBox("Outlet configuration was saved successfully.", "success");
-		header("Location: outlets.php");
+		header("Location: modules.php");
 		exit();
 
 
@@ -128,17 +133,18 @@ if (strpos($_SERVER['PHP_SELF'], 'outlets') !== false) {
 		} else {
 			msgBox("Outlet ".$outlet." on ".$ipAddress['moduleSerial']." failed to turn ".$command." successfully.", "danger");
 		}
-		header("Location: outlets.php");
+		header("Location: modules.php");
 		exit();
 	}
 }
 
 # ENTRY ADDITIONS
 # Adding a maintenance note
-if (isset($_POST['maintenance-note-textarea']) && isset($_POST['maintenance-type'])) {
+if (isset($_POST['maintenance-note-textarea']) && isset($_POST['maintenance-type']) && isset($_POST['maintenance-date'])) {
   $note = $conn->real_escape_string($_POST['maintenance-note-textarea']);
   $type = $conn->real_escape_string($_POST['maintenance-type']);
-  $insertData = $conn->query("INSERT INTO `tankkeeping_entries` (`id`, `type_id`, `timestamp`, `note`) VALUES (NULL, '".intval($type)."', CURRENT_TIMESTAMP, '".$note."')");
+  $date = correctTZInsert($conn->real_escape_string($_POST['maintenance-date'].":00"), $site_settings['tz']);
+  $insertData = $conn->query("INSERT INTO `tankkeeping_entries` (`id`, `type_id`, `timestamp`, `note`) VALUES (NULL, '".intval($type)."', '".$date."', '".$note."')");
   msgBox("Entry has been added", "success");
   header("Location: dashboard.php");
   exit();
@@ -149,7 +155,8 @@ if (isset($_POST['single-metric-value']) && isset($_POST['single-metric-date']) 
   foreach ($_POST['smetric-type'] as $selectedOption) {
     $value = $conn->real_escape_string($_POST['single-metric-value']);
     $type = $conn->real_escape_string($selectedOption);
-    $insertData = $conn->query("INSERT INTO `parameter_entries` (`id`, `type_id`, `timestamp`, `value`) VALUES (NULL, '".intval($type)."', CURRENT_TIMESTAMP, '".$value."')");
+    $date = correctTZInsert($conn->real_escape_string($_POST['single-metric-date'].":00"), $site_settings['tz']);
+    $insertData = $conn->query("INSERT INTO `parameter_entries` (`id`, `type_id`, `timestamp`, `value`) VALUES (NULL, '".intval($type)."', '".$date."', '".$value."')");
   }
   msgBox("Entry has been added", "success");
   header("Location: dashboard.php");

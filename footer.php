@@ -203,7 +203,18 @@
                                                   });
                                                   var values = jsonData.jsonarray.map(function(e) {
                                                     return e.value;
-                                                  });
+						  });
+						  if (jsonData.annotations) {
+						     if (Object.keys(jsonData.annotations).length >= 1) {
+							  //var anno = JSON.stringify(jsonData.annotations);
+							  var anno = jsonData.annotations;
+                                                      //var anno = jsonData.annotations.map(function(e) {
+                                                      //  return e.annotations;
+							  //});
+						     }
+						  } else {
+							  var anno = [];
+						  }
                                                   var ctx = document.getElementById("line-chart-"+realName).getContext('2d');
                                                   var config = {
                                                        type: 'line',
@@ -214,23 +225,11 @@
 		  				         tooltips: {
 		  				  	   mode: 'index',
 		  					   intersect: false,
-		  				         },
-						         //annotation: { 
-						         //  annotations: [{ 
-							 //    type: 'line', 
-  							 //    mode: 'vertical',
-							 //    scaleID: 'x-axis-0',
-							 //    value: '10/29/18 04:40',
-							 //    borderColor: 'tomato',
-							 //    borderWidth: 1,
-							 //    label: {
-							 //    	content: "Outlet",
-							 //	enabled: true,
-							 //	position: "top"
-							 //    }
-						  	 //  }],
-							 //  drawTime: "afterDraw"
-						         //},
+							  },
+							 annotation: {
+							 	drawTime: "afterDraw",
+								annotations: anno 
+							 },
                                                        },
 		  				       hover: {
 		  				 	 mode: 'nearest',
