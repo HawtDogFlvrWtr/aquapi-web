@@ -51,6 +51,12 @@ function correctTZ($dateString, $tz) {
   $real_date->setTimeZone(new DateTimeZone($tz));
   return $real_date->format('m/d/y H:i');
 }
+function correctTZgchart($dateString, $tz) {
+  $real_date = new DateTime($dateString, new DateTimeZone('UTC'));
+  $real_date->setTimeZone(new DateTimeZone($tz));
+  $real_date->modify('-1 month');
+  return $real_date->format('Y,m,d,H,i,s');
+}
 function correctTZInsert($dateString, $tz) {
   $real_date = new DateTime($dateString, new DateTimeZone($tz));
   $real_date->setTimeZone(new DateTimeZone('UTC'));
@@ -84,12 +90,12 @@ if (isset($_GET['override'])) {
 # Run for all pages
 $lightMenuOverrideList = $conn->query("SELECT * from light_override ORDER BY type");
 $pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type");
-$parameterList = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
+$parameterList = $conn->query("SELECT id, eventName from parameter_types WHERE dontGraph = 0 ORDER BY eventName");
 
 # Only run on dashboard.php 
  if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false || strpos($_SERVER['PHP_SELF'], 'guest') !== false) {
-	$singleMetric = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
-	$graphs = $conn->query("SELECT type_id FROM parameter_entries WHERE id IN (SELECT MIN(id) FROM parameter_entries GROUP BY type_id DESC) ORDER BY `parameter_entries`.`type_id` DESC");
+	$singleMetric = $conn->query("SELECT parameter_entries.type_id, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
+	$graphs = $conn->query("SELECT parameter_entries.type_id, parameter_types.lineColor, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
 	$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
 	$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
  }

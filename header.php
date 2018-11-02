@@ -106,50 +106,6 @@ include 'functions.php';
 			   </a>
 			 </li>
 			 <li class="dropdown notification-list">
-                           <a class="<?php if ($site_settings['light_override'] != 'resume'){ echo 'rubberBand animated infinite';}?> nav-link dropdown-toggle arrow-none" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-			    <i id="light" title="Light Status" class="mdi mdi-lightbulb-on-outline noti-icon"></i>
-			   </a>
-                        <?php
-                        if ($currentPage != 'guest.php') {
-                        ?>
-   			   <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated profile-dropdown ">
-                                    <!-- item-->
-                                    <div class=" dropdown-header noti-title">
-                                        <h6 class="text-overflow m-0">Light Override</h6>
-                                    </div>
-				    <?php 
-				    if ($site_settings['override'] == '' || $site_settings['override'] == 'resume') {
-					$classModify = 'text-warning';
-				    } else {
-					$classModify = '';
-				    }
-				    ?>
-                                    <a href="dashboard.php?override=resume" class="dropdown-item notify-item <?php echo $classModify;?>">
-                                        <i class="mdi mdi-reload"></i>
-                                        <span>Resume Schedule</span>
-                                    </a>
-				    <?php
-					while($row = $lightMenuOverrideList->fetch_assoc()) {
-					  if ($site_settings['override'] != "" && $site_settings['override'] == $row['value']) {
-						$classModify = 'text-warning';
-					  } else {
-						$classModify = '';
-					  }
-				    ?>
-                                    <!-- item-->
-                                    <a href="dashboard.php?override=<?php echo $row['value'];?>" class="dropdown-item notify-item <?php echo $classModify;?>">
-                                        <i class="mdi <?php echo $row['icon']?>"></i>
-                                        <span><?php echo $row['type'];?></span>
-                                    </a>
-				    <?php } ?>
-
-			   </div>
-			<?php } ?>
-			 </li>
-			 <li class="dropdown notification-list">
-                           <a class="nav-link" href="#"><i title="Pump Status" id="pump" class="mdi mdi-fan noti-icon"></i></a>
-			 </li>
-			 <li class="dropdown notification-list">
                            <a class="nav-link" title="Log Out" href="index.php?logout"><i id="logout" class="mdi mdi-logout noti-icon"></i></a>
 			 </li>
 			</ul>

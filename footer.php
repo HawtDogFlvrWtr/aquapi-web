@@ -154,6 +154,7 @@
         <!-- third party js -->
 	<script src="assets/js/vendor/Chart.bundle.min.js"></script>
 	<script src="assets/js/vendor/chartjs-plugin-annotation.min.js"></script>
+	<script src="assets/js/vendor/chartjs-plugin-zoom.min.js"></script>
 	<script src="assets/js/vendor/jquery-ui.min.js"></script>
         <script src="assets/js/vendor/fullcalendar.min.js"></script>
         <script src="assets/js/pages/demo.calendar.js"></script>
@@ -218,7 +219,22 @@
                                                   var ctx = document.getElementById("line-chart-"+realName).getContext('2d');
                                                   var config = {
                                                        type: 'line',
-                                                       options: {
+						       options: {
+							 scales: {
+							   xAxes: [{
+							     gridLines: {
+							       display:false
+							     },
+							     ticks: {
+							       display: false
+							     }
+							   }],
+							   yAxes: [{
+							     gridLines: {
+							       display: true
+							     },
+							   }]
+							 },
                                                          animation: {
                                                            duration: 2 
                                                          },
@@ -227,8 +243,8 @@
 		  					   intersect: false,
 							  },
 							 annotation: {
-							 	drawTime: "afterDraw",
-								annotations: anno 
+								drawTime: "afterDatasetsDraw",
+								annotations: anno,
 							 },
                                                        },
 		  				       hover: {
@@ -244,7 +260,7 @@
                                                                   pointRadius: 0,
                                                                   pointBackgroundColor: metricColor,
 								  borderColor: metricColor,
-                                                                  borderWidth: 1
+                                                                  borderWidth:1 
                                                           }]
                                                        },
                                                   };

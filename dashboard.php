@@ -41,30 +41,28 @@ include 'header.php';
                                 <div class="row">
  				<?php
 				while($row = $singleMetric->fetch_assoc()) {
-                                    $query = $conn->query("SELECT eventName from parameter_types where id=".$row['type_id']);
-				    $metricName = $query->fetch_array();
 				?>
                                     <div class="col-lg-3">
                                         <div class="card widget-flat text-center">
                                             <div class="card-body">
 						<div class="dropdown float-right">
-						    <a id="<?php echo $metricName['eventName'];?>" href="#" class="card-drop" data-toggle="modal" data-target="#smetric<?php echo $metricName['eventName'];?>" aria-expanded="false">
+						    <a id="<?php echo $row['eventName'];?>" href="#" class="card-drop" data-toggle="modal" data-target="#smetric<?php echo $row['eventName'];?>" aria-expanded="false">
         	                                        <i class="mdi mdi-plus"></i>
                 	                            </a>
 						</div>
-                                                <h5 id="single-metric-title" class="text-muted font-weight-normal mt-3" title="Current tank temperature"><?php echo $metricName['eventName'] ?></h5>
-                                                <p id="<?php echo $metricName['eventName'] ?>-single-metric" class="text-nowrap display-4 mt-1 mb-1"></p>
+                                                <h5 id="single-metric-title" class="text-muted font-weight-normal mt-3" title="Current tank temperature"><?php echo $row['eventName'] ?></h5>
+                                                <p id="<?php echo $row['eventName'] ?>-single-metric" class="text-nowrap display-4 mt-1 mb-1"></p>
                                                 <h5 class="mb-0 text-muted">
-                                                    <span id="<?php echo $metricName['eventName'] ?>-single-metric-date" class="text-nowrap">Loading..</span>
+                                                    <span id="<?php echo $row['eventName'] ?>-single-metric-date" class="text-nowrap">Loading..</span>
                                                 </h5>
                                             </div> <!-- end card-body-->
                                         </div> <!-- end card-->
                                     </div> <!-- end col-->
-                                       	<div class="modal fade" id="smetric<?php echo $metricName['eventName'];?>" tabindex="40" role="dialog" aria-labelledby="smetric<?php echo $metricName['eventName'];?>" aria-hidden="true">
+                                       	<div class="modal fade" id="smetric<?php echo $row['eventName'];?>" tabindex="40" role="dialog" aria-labelledby="smetric<?php echo $row['eventName'];?>" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-sm">
        	                                        <div class="modal-content">
                	                                    <div class="modal-header">
-                       	                                <h4 class="modal-title" id="smetric-<?php echo $row['type_id'];?>"><?php echo str_replace("_", " ", $metricName['eventName']);?></h4>
+                       	                                <h4 class="modal-title" id="smetric-<?php echo $row['type_id'];?>"><?php echo str_replace("_", " ", $row['eventName']);?></h4>
                                	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                        	            </div>
                                                	    <div class="modal-body">
@@ -77,7 +75,7 @@ include 'header.php';
 								</div>
 								<div class="form-group mb-3">
 		                                                    <label>New value</label>
-                		                                    <input type="text" id="<?php echo $metricName['eventName'];?>-single-metric-modal" name="single-metric-value" value="">
+                		                                    <input type="text" id="<?php echo $row['eventName'];?>-single-metric-modal" name="single-metric-value" value="">
                                 		                </div>
 							    <input type="hidden" name="smetric-type[]" id="smetric-type" value="<?php echo $row['type_id'];?>">
 							    <button id="submit" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
@@ -217,22 +215,18 @@ include 'header.php';
 			    </div>
 			    <!--endcol -->
                         </div>
-                        <!-- end row -->
-
+			<!-- end row -->
                         <div class="row">
  			    <?php
-			    while($row = $graphs->fetch_assoc()) {
-				    $query = $conn->query("SELECT lineColor,eventName from parameter_types where id=".$row['type_id']);
-				    $metricName = $query->fetch_array();
+			      while($row = $graphs->fetch_assoc()) {
 			    ?>
                             <div class="col-xl-4">
                                 <div class="card">
                                     <div class="card-body">
-					<h4 color="<?php echo $metricName['lineColor'];?>" id="chart-title" class="header-title mb-4"><?php echo $metricName['eventName'];?> Chart</h4>
-                                        <div id="chart-<?php echo $metricName['eventName'];?>" class="mt-3 chartjs-chart" style="min-height: 150px;">
-                                            <canvas id="line-chart-<?php echo $metricName['eventName'];?>"></canvas>
+					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title mb-4"><?php echo $row['eventName'];?> Chart</h4>
+                                        <div id="chart-<?php echo $row['eventName'];?>" class="mt-3 chartjs-chart" style="min-height: 150px;">
+                                            <canvas id="line-chart-<?php echo $row['eventName'];?>"></canvas>
                                         </div>
-                                                                                                                                                                                                                   
                                     </div> <!-- end card body-->
                                 </div> <!-- end card -->
                             </div><!-- end col-->
