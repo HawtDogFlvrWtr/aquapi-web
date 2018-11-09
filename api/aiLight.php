@@ -6,7 +6,8 @@ include '../functions.php';
 
 function deviceDetails($host) {
 	try {
-		$response = file_get_contents($host."/identity");
+		$response = file_get_contents("http://192.168.1.242/api/identity");
+		#$response = file_get_contents($host."/identity");
 		#var_dump($response);
 		#$r_data = json_decode($response);
 	} catch (Exception $e)  {
@@ -15,12 +16,11 @@ function deviceDetails($host) {
 	return $response;
 
 }
-
-if (isset($_GET['aiHosts'])) {
-	$url = $conn->real_escape_string($_GET['aiHosts']);
-	$host = 'http://'.$url.'/api';
-	var_dump($host);
-	$details = deviceDetails($host);
-	var_dump($details);
-}
+$options = stream_context_create(array('http'=>
+	array(
+		'timeout' => 1 
+	)
+));
+	$response = file_get_contents('http://192.168.1.242/api/colors', false, $options);
+	echo $response;
 ?>

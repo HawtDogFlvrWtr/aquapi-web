@@ -70,15 +70,15 @@ include 'header.php';
 							  <div class="form-group mb-3">
 								<div class="form-group mb-3">
 								    <label>Date/Time</label>
-								    <input class="form-control date" type="text" id="dateInput" name="single-metric-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
+								    <input class="form-control date" type="text" id="dateInput<?php echo $row['type_id'];?>" name="single-metric-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="false" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
 
 								</div>
 								<div class="form-group mb-3">
 		                                                    <label>New value</label>
                 		                                    <input type="text" id="<?php echo $row['eventName'];?>-single-metric-modal" name="single-metric-value" value="">
                                 		                </div>
-							    <input type="hidden" name="smetric-type[]" id="smetric-type" value="<?php echo $row['type_id'];?>">
-							    <button id="submit" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
+							    <input type="hidden" name="smetric-type[]" id="smetric-type<?php echo $row['type_id'];?>" value="<?php echo $row['type_id'];?>">
+							    <button id="submitsmetric<?php echo $row['type_id'];?>" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
 							  </div>
 							</form>
                                                     </div>
@@ -89,7 +89,7 @@ include 'header.php';
 				}
 				?>
                                     <div class="col-lg-3">
-                                        <div class="card widget-flat text-center">
+                                        <div class="widget-flat text-center">
                                             <div class="card-body">
                                                 <a id="add-single-metric" href="" class="display-1 mdi mdi-plus mt-1 mb-3" data-toggle="modal" data-target="#add-metric" aria-expanded="false"></a>
                                             </div> <!-- end card-body-->
@@ -107,7 +107,7 @@ include 'header.php';
 							  <div class="form-group mb-3">
 								<div class="form-group mb-3">
 								    <label>Date/Time</label>
-								    <input class="form-control date" type="text" id="dateInput" name="single-metric-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-auto-input-update="true" data-set-start-date="now" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
+								    <input class="form-control date" type="text" name="single-metric-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
 
 
 								</div>
@@ -123,7 +123,7 @@ include 'header.php';
 		                                                    <label class="mt-1">New value</label>
                 		                                    <input class="form-control" type="text" id="add-value" name="single-metric-value" value="">
                                 		                </div>
-							    <button id="submit" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
+							    <button id="submitsmetricAdd<?php echo $row['eventName'];?>" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
 							  </div>
 							</form>
                                                     </div>
@@ -166,14 +166,14 @@ include 'header.php';
 								<form action="dashboard.php" method="post">
 								  <div class="form-group mb-3">
 								    <label>Date/Time</label>
-								    <input class="form-control date" type="text" id="dateInput" name="maintenance-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
+								    <input class="form-control date" type="text" name="maintenance-date" data-toggle="date-picker" data-single-date-picker="true" data-time-picker="true" data-auto-update-input="true" data-show-dropdowns="true" data-time-picker-24-hour="true" data-locale='{"format":"YYYY-MM-DD HH:mm"}' data-start-date="<?php echo $calendarDate;?>">
 
 								  </div>
 								  <div class="form-group mb-3">
 								    <label for="maintenance-note-textarea">Note</label>
-								    <textarea class="form-control" name="maintenance-note-textarea" id="maintenance-note-textarea" rows="5"></textarea>
-								    <input type="hidden" name="maintenance-type" id="maintenance-type" value="<?php echo $row['id'];?>">
-								    <button id="submit" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
+								    <textarea class="form-control" name="maintenance-note-textarea" id="maintenance-note-textarea-<?php echo $row['id'];?>" rows="5"></textarea>
+								    <input type="hidden" name="maintenance-type" id="maintenance-type<?php echo $row['id'];?>" value="<?php echo $row['id'];?>">
+								    <button id="submitMaint<?php echo $row['id'];?>" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
 								  </div>
 								</form>
 	                                                    </div>
@@ -226,7 +226,8 @@ include 'header.php';
 					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title mb-4"><?php echo $row['eventName'];?> Chart</h4>
                                         <div id="chart-<?php echo $row['eventName'];?>" class="mt-3 chartjs-chart" style="min-height: 150px;">
                                             <canvas id="line-chart-<?php echo $row['eventName'];?>"></canvas>
-                                        </div>
+					</div>
+					<div id="annoLegend-<?php echo $row['eventName'];?>" class="float-left"></div>
                                     </div> <!-- end card body-->
                                 </div> <!-- end card -->
                             </div><!-- end col-->

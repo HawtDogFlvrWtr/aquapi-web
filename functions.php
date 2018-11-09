@@ -18,6 +18,9 @@ if (isset($_POST['email']) && isset($_POST['password'])){
     }
   }
 }
+
+
+
 $noLogin = array('login.php', 'guest.php', 'chartData.php', 'singleValue.php');
 $needLogin = array('dashboard.php', 'modules.php', 'calendar.php');
 if (in_array($currentPage, $needLogin)) {
@@ -62,6 +65,11 @@ function correctTZInsert($dateString, $tz) {
   $real_date->setTimeZone(new DateTimeZone('UTC'));
   return $real_date->format('y/m/d H:i:s');
 }
+function correctTZEpoch($dateString, $tz) {
+  $real_date = new DateTime($dateString, new DateTimeZone('UTC'));
+  $real_date->setTimeZone(new DateTimeZone('UTC'));
+  return $real_date->format('U');
+}
 $graphLimit = explode(",", $site_settings['graphLimit']);
 
 # Store alets
@@ -91,6 +99,7 @@ if (isset($_GET['override'])) {
 $lightMenuOverrideList = $conn->query("SELECT * from light_override ORDER BY type");
 $pumpMenuOverrideList = $conn->query("SELECT * from pump_override ORDER BY type");
 $parameterList = $conn->query("SELECT id, eventName from parameter_types WHERE dontGraph = 0 ORDER BY eventName");
+$parameterListModule = $conn->query("SELECT id, eventName from parameter_types ORDER BY eventName");
 
 # Only run on dashboard.php 
  if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false || strpos($_SERVER['PHP_SELF'], 'guest') !== false) {
@@ -151,6 +160,9 @@ if (isset($_POST['maintenance-note-textarea']) && isset($_POST['maintenance-type
   $type = $conn->real_escape_string($_POST['maintenance-type']);
   $date = correctTZInsert($conn->real_escape_string($_POST['maintenance-date'].":00"), $site_settings['tz']);
   $insertData = $conn->query("INSERT INTO `tankkeeping_entries` (`id`, `type_id`, `timestamp`, `note`) VALUES (NULL, '".intval($type)."', '".$date."', '".$note."')");
+  if ($type == 6) { // Start feeding if we enter a feeding entry.
+  	$insertFeedingParamData = $conn->query("INSERT INTO `parameter_entries` (`type_id`, `value`) VALUES (26, 1)");
+  }
   msgBox("Entry has been added", "success");
   header("Location: dashboard.php");
   exit();
@@ -168,5 +180,5 @@ if (isset($_POST['single-metric-value']) && isset($_POST['single-metric-date']) 
   header("Location: dashboard.php");
   exit();
 }
-#
+
 ?>

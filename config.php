@@ -21,7 +21,6 @@ $conn->query("SET time_zone='+00:00';");  # Use the system settings that mysql i
 // Get Settings Data
 $setSql = "
           SELECT
-                python_update,
                 dashboard_update,
                 tz,
 		graphLimit,
@@ -36,6 +35,13 @@ $setSql = "
 		light_override,
 		pump_override,
 		tempScale,
+		feedTime,
+		ecobeeAPI,
+		ecobeePIN,
+		ecobeeAccess,
+		ecobeeRefresh,
+		ecobeeTokenType,
+		ecobeeAuthCode,
 		version
           FROM
                 settings

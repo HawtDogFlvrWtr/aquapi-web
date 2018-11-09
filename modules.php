@@ -76,8 +76,8 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                                                 			<select id="triggerParam" name="triggerParam" class="form-control">
                                                     				<option></option>
 									<?php 
-										mysqli_data_seek($parameterList, 0);
-										while($pList = $parameterList->fetch_assoc()) {
+										mysqli_data_seek($parameterListModule, 0);
+										while($pList = $parameterListModule->fetch_assoc()) {
 											if ($pList['id'] == $portRow['outletTriggerParam']) {
 												echo '<option selected value="'.$pList['id'].'">'.$pList['eventName'].'</option>';
 											} else {

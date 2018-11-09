@@ -21,7 +21,7 @@ if (isset($_GET['check'])) {
   } elseif (stripos($limit, 'YEAR')){
     $div = 1209600;
   } elseif (stripos($limit, 'DAY')){
-    $div = 60;
+    $div = 300;
   } elseif (stripos($limit, 'HOUR')){
     $div = 60;
   } else {
@@ -29,11 +29,12 @@ if (isset($_GET['check'])) {
   }
   $arr = array();
   $annArr = array();
+  $annoArray = array();
   $check = $conn->real_escape_string($_GET['check']);
   $query = $conn->query("SELECT id,annoColor FROM parameter_types WHERE eventName='".$check."'");
   $typeID = $query->fetch_array();
   #$returnTriggerValue = $conn->query("SELECT id, value, timestamp FROM outlet_trigger_entries WHERE paramId=".$typeID['id']." AND timestamp >= now() - INTERVAL ".$limit." GROUP BY UNIX_TIMESTAMP(timestamp) DIV ".$div." ORDER BY timestamp ASC");
-  if ($div == 60) { # Don't show annotations on graphs over a week.
+  if ($div < 300) { # Don't show annotations on graphs over a week.
 	  $returnTriggerValue = $conn->query("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE value = 'on' AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC");
 	  #$returnTriggerValue = $conn->query("SELECT id, value, timestamp FROM outlet_trigger_entries WHERE paramId=".$typeID['id']." AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC");
 	  $rotate = 0;
@@ -45,15 +46,20 @@ if (isset($_GET['check'])) {
 		$annoQuery2 = $conn->query("SELECT * FROM outlet_types WHERE id = ".$annoColor['outletType']);
 		$annoColor2 = $annoQuery2->fetch_array();
 		list($r, $g, $b) = sscanf($annoColor2['typeColor'], "#%02x%02x%02x");
+		$workedValue = $annoColor2['typeColor'].":".$annoColor2['outletType'].":".$annoColor2['typeIcon'];
+		if (!in_array($workedValue, $annoArray)) {
+			$annoArray[] = $workedValue;
+		}
 		$real_date = correctTZ($value['timestamp'], $site_settings['tz']);
 		$endValue = correctTZ($triggerVal2['timestamp'], $site_settings['tz']);
 		if ($real_date != $endValue) {
-			$trans = "0.4";
+			$trans = "0.2";
 		} else {
 			$trans = "2";
 		}
 		$annArr['annotations'][] = array(
-			"drawTime" => "afterDatasetsDraw",
+			#"drawTime" => "afterDatasetsDraw",
+			"drawTime" => "beforeDatasetsDraw",
 			#"id" => $value['id'],
 			"type" => "box",
 			"mode" => "vertical",
@@ -87,6 +93,7 @@ if (isset($_GET['check'])) {
 	"value" => $value['value'],
     );
   }
+  $arr['annoList'] = $annoArray;
   $arr['annotations'] =  $annArr['annotations'];
   echo json_encode($arr);
   
