@@ -47,6 +47,10 @@
 				<input data-toggle="touchspin" type="text" value="<?php echo $site_settings['feedTime'] / 60;?>">
 			</div>
 			<div class="form-group mb-3">
+				<label>Clean time (Mins.)</label>
+				<input data-toggle="touchspin" type="text" value="<?php echo $site_settings['cleanTime'] / 60;?>">
+			</div>
+			<div class="form-group mb-3">
 				<label>Default Graph Limit</label>
 	                        <select class="form-control" id="limit-select" name="limit">
 					  <?php 
@@ -238,6 +242,7 @@
                                                                   data: values,
                                                                   pointRadius: 0,
                                                                   pointBackgroundColor: metricColor,
+                                                                  //backgroundColor: "#39afd1",
 								  borderColor: metricColor,
                                                                   borderWidth:1 
                                                           }]

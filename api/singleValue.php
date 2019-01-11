@@ -15,9 +15,12 @@ if (isset($_GET['check'])) {
   }
   $rows = array();
   while($r = $returnValueQuery->fetch_assoc()) {
-  	if ($r['type_id'] == 23) {
-	    $r['value'] = round($r['value'], 1);
-	  }
+	#$returnValueQueryAvg = $conn->query("SELECT AVG(parameter_entries.value) AS avg_value FROM parameter_entries INNER JOIN parameter_types ON parameter_types.id=parameter_entries.type_id WHERE parameter_entries.type_id = ".$r['type_id']);
+	#$returnValueAssoc = $returnValueQueryAvg->fetch_assoc();
+	#$r['avg_value'] = round($returnValueAssoc['avg_value'], $r['decimals']);
+#  	if ($r['type_id'] == 23) {
+	    $r['value'] = round($r['value'], $r['decimals']);
+#	  }
 	$r['timestamp'] = correctTZ($r['timestamp'], $site_settings['tz']);
 	$rows[] = $r;
   }

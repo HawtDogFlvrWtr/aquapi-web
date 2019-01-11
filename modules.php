@@ -132,8 +132,53 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
-		                                                    <label class="mt-1">Outlet Note</label>
-								    <input class="form-control" type="text" id="outletNote" name="outletNote" value="<?php echo $portRow['outletNote'];?>">
+		                                                        <label class="mt-1">Outlet Note</label>
+									<input class="form-control" type="text" id="outletNote" name="outletNote" value="<?php echo $portRow['outletNote'];?>">
+		                                                        <label class="mt-1">Off During Feeding</label>
+                                                			<select id="feedCommand" name="feedCommand" class="form-control">
+										<option></option>
+									<?php	
+										$possibleCommands = array("No", "Yes",);
+										foreach ($possibleCommands as $key => $command) {
+											
+											if ($key == $portRow['offAtFeeding']) {
+												echo '<option selected value="'.$key.'">'.$command.'</option>';
+											} else {
+												echo '<option value="'.$key.'">'.$command.'</option>';
+											}
+										}
+									?>
+									</select>
+		                                                    <label class="mt-1">Off During Cleaning</label>
+                                                			<select id="cleanCommand" name="cleanCommand" class="form-control">
+										<option></option>
+									<?php	
+										$possibleCommands = array("No", "Yes",);
+										foreach ($possibleCommands as $key => $command) {
+											
+											if ($key == $portRow['offAtCleaning']) {
+												echo '<option selected value="'.$key.'">'.$command.'</option>';
+											} else {
+												echo '<option value="'.$key.'">'.$command.'</option>';
+											}
+										}
+									?>
+									</select>
+		                                                    <label class="mt-1">Always On</label>
+                                                			<select id="AOCommand" name="AOCommand" class="form-control">
+										<option></option>
+									<?php	
+										$possibleCommands = array("No", "Yes",);
+										foreach ($possibleCommands as $key => $command) {
+											
+											if ($key == $portRow['alwaysOn']) {
+												echo '<option selected value="'.$key.'">'.$command.'</option>';
+											} else {
+												echo '<option value="'.$key.'">'.$command.'</option>';
+											}
+										}
+									?>
+									</select>
                                 		                </div>
 							    <input type="hidden" name="outletId" id="outletId" value="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>">
 							    <button id="submit" type="submit" class="float-right btn btn-secondary mt-2 mb-2">Submit</button>

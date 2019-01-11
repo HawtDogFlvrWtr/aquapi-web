@@ -31,7 +31,7 @@ while(true) {
 			echo "recordTime: ".$recordTime." ".$currentTime."\n";
 			if ($recordTime + $site_settings['feedTime'] < $currentTime) {	// Check if feeding time is over.
 				$conn->query("INSERT INTO parameter_entries (type_id, value) VALUES (26, 0)"); // Set that feeding is over.
-				echo("feeding ending");
+				echo("Feeding Ended");
 			}
 		} else if ($row['offAtFeeding'] == 0) {
 			if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {

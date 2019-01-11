@@ -117,11 +117,14 @@ if (strpos($_SERVER['PHP_SELF'], 'modules') !== false) {
 		$triggerTest = $conn->real_escape_string($_POST['triggerTest']);
 		$triggerValue = $conn->real_escape_string($_POST['triggerValue']);
 		$triggerCommand = $conn->real_escape_string($_POST['triggerCommand']);
+		$cleanCommand = $conn->real_escape_string($_POST['cleanCommand']);
+		$feedCommand = $conn->real_escape_string($_POST['feedCommand']);
+		$AOCommand = $conn->real_escape_string($_POST['AOCommand']);
 		$outletType = $conn->real_escape_string($_POST['outletType']);
 		$outletNote = $conn->real_escape_string($_POST['outletNote']);
 		$outletId = $conn->real_escape_string($_POST['outletId']);
 		$outletIdSplit = explode("-",$outletId);
-		$pushUpdate = $conn->query("UPDATE outlet_entries SET outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
+		$pushUpdate = $conn->query("UPDATE outlet_entries SET outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', offAtCleaning = '".$cleanCommand."', offAtFeeding = '".$feedCommand."', alwaysOn = '".$AOCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
 		msgBox("Outlet configuration was saved successfully.", "success");
 		header("Location: modules.php");
 		exit();

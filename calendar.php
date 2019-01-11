@@ -19,7 +19,7 @@ include 'header.php';
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-lg-9">
+                                            <div class="col-lg-12">
                                                 <div id="calendar"></div>
                                             </div> <!-- end col -->
                                             <div class="col-lg-3">

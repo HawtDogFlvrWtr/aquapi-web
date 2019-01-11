@@ -36,6 +36,7 @@ $setSql = "
 		pump_override,
 		tempScale,
 		feedTime,
+		cleanTime,
 		ecobeeAPI,
 		ecobeePIN,
 		ecobeeAccess,

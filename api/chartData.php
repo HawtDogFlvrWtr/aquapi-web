@@ -31,7 +31,7 @@ if (isset($_GET['check'])) {
   $annArr = array();
   $annoArray = array();
   $check = $conn->real_escape_string($_GET['check']);
-  $query = $conn->query("SELECT id,annoColor FROM parameter_types WHERE eventName='".$check."'");
+  $query = $conn->query("SELECT id,annoColor,decimals FROM parameter_types WHERE eventName='".$check."'");
   $typeID = $query->fetch_array();
   #$returnTriggerValue = $conn->query("SELECT id, value, timestamp FROM outlet_trigger_entries WHERE paramId=".$typeID['id']." AND timestamp >= now() - INTERVAL ".$limit." GROUP BY UNIX_TIMESTAMP(timestamp) DIV ".$div." ORDER BY timestamp ASC");
   if ($div < 300) { # Don't show annotations on graphs over a week.
@@ -39,7 +39,7 @@ if (isset($_GET['check'])) {
 	  #$returnTriggerValue = $conn->query("SELECT id, value, timestamp FROM outlet_trigger_entries WHERE paramId=".$typeID['id']." AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC");
 	  $rotate = 0;
 	  while ($value = $returnTriggerValue->fetch_array()) {
-		$returnTriggerValue2 = $conn->query("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE value = 'off' AND id > ".$value['id']." AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC LIMIT 1");
+		$returnTriggerValue2 = $conn->query("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE paramId = ".$value['paramId']." AND value = 'off' AND id > ".$value['id']." AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC LIMIT 1");
 		$triggerVal2 = $returnTriggerValue2->fetch_array();
   	  	$annoQuery = $conn->query("SELECT outlet_entries.outletType FROM outlet_trigger_entries LEFT JOIN outlet_entries ON outlet_trigger_entries.moduleId = outlet_entries.moduleId AND outlet_trigger_entries.outletId = outlet_entries.portNumber WHERE outlet_trigger_entries.id=".$value['id']);
 		$annoColor = $annoQuery->fetch_array();
@@ -53,9 +53,9 @@ if (isset($_GET['check'])) {
 		$real_date = correctTZ($value['timestamp'], $site_settings['tz']);
 		$endValue = correctTZ($triggerVal2['timestamp'], $site_settings['tz']);
 		if ($real_date != $endValue) {
-			$trans = "0.2";
+			$trans = "0.4";
 		} else {
-			$trans = "2";
+			$trans = "4";
 		}
 		$annArr['annotations'][] = array(
 			#"drawTime" => "afterDatasetsDraw",
@@ -78,16 +78,16 @@ if (isset($_GET['check'])) {
 		);
 	  }
   }
-  $query = $conn->query("SELECT id,annoColor FROM parameter_types WHERE eventName='".$check."'");
-  $typeID = $query->fetch_array();
+#  $query = $conn->query("SELECT id,annoColor,decimals FROM parameter_types WHERE eventName='".$check."'");
+#  $typeID = $query->fetch_array();
   $returnValue = $conn->query("SELECT value, timestamp FROM parameter_entries WHERE type_id=".$typeID['id']." AND timestamp >= now() - INTERVAL ".$limit." GROUP BY UNIX_TIMESTAMP(timestamp) DIV ".$div." ORDER BY timestamp ASC");
   #$returnValue = mysql_query("SELECT value, timestamp FROM parameter_entries WHERE type_id=".$typeID['id']." AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC");
   while ($value = $returnValue->fetch_array()) {
     $real_date = correctTZ($value['timestamp'], $site_settings['tz']);
     # Correct for temperature
-    if ($typeID['id'] == 23) {
-      $value['value'] = round($value['value'], 2);
-    }
+#    if ($typeID['id'] == 23) {
+      $value['value'] = round($value['value'], $typeID['decimals']);
+#    }
     $arr['jsonarray'][] = array(
 	"label" => $real_date,
 	"value" => $value['value'],

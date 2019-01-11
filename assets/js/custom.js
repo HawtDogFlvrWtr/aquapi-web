@@ -5,6 +5,7 @@
 							var obj = json[i];
 							var timestamp = obj.timestamp;
 							var value = obj.value;
+							var avg_value = obj.avg_value;
 							var eventName = obj.eventName;
 							var decimal = obj.decimals;
 							var step = obj.step;
@@ -19,11 +20,11 @@
 						      if(!$(`#smetric${eventName}`).hasClass('show')){
         	        	                        $(`#${eventName}-single-metric-modal`).val(value);
 						      }
-                        		              $(`#${eventName}-single-metric-date`).text(timestamp);
+                        		              $(`#${eventName}-single-metric-date`).text(`${timestamp}`);
                                 	    	};
 				    	});
                                   }
-                                  setInterval(captureCards, 10000);
+                                  setInterval(captureCards, 30000);
                                   captureCards();
 
                                   function captureDevices() {
@@ -34,6 +35,7 @@
 					    } else {
 						var apiHit = 'devices';
 					    }
+					    if (metricName != 'logout') { // Don't pull logout as a device or metric
 	                                    $.get(`api/singleValue.php?${apiHit}=${metricName}`, function (data) {
 					      if (metricName == 'Temperature') {
 						json = JSON.parse(data);
@@ -78,9 +80,10 @@
 						}
 					      }	
                                 	    });
+				            }
 				    });
                                   }
-                                  setInterval(captureDevices, 5000);
+                                  setInterval(captureDevices, 30000);
                                   captureDevices();
 		
 
