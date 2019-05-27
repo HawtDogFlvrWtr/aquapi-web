@@ -9,3 +9,4 @@
 apache2, php, mariadb-server, mariadb, git, phpmyadmin, python-smbus, i2c-tools
 
 raspi-config enable i2c and reboot
+mysql -u aquapi -p < aquapi.sql aquapi
