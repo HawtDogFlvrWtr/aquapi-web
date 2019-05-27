@@ -48,6 +48,7 @@ $setSql = "
 ";
 $result = $conn->query($setSql);
 $site_settings = $result->fetch_assoc() or die('-99'.mysqli_error());
+date_default_timezone_set($tz);
 $sessionId = $site_settings['sessionId'];
 $currentPage = end(explode("/", $_SERVER['REQUEST_URI']));
 ?>

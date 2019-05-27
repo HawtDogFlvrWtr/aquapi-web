@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set($tz);
 # Username Info
 session_start();
 if (isset($_GET['debug'])) {
@@ -74,7 +75,7 @@ function correctAttTZ($dateString, $tz) {
   $real_date->setTimeZone(new DateTimeZone($tz));
   return $real_date->format('Y-m-d H:i');
 }
-$calendarDate = correctAttTZ(date("Y-m-d H:i"), $site_settings['tz']);
+$calendarDate = correctAttTZ(date(), $site_settings['tz']);
 $graphLimit = explode(",", $site_settings['graphLimit']);
 
 # Store alets

@@ -132,9 +132,9 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
-		                                                        <label class="mt-1">Outlet Note</label>
+		                                                        <label class="mt-1" title="Note that will appear below the outlet">Outlet Note</label>
 									<input class="form-control" type="text" id="outletNote" name="outletNote" value="<?php echo $portRow['outletNote'];?>">
-		                                                        <label class="mt-1">Off During Feeding</label>
+		                                                        <label class="mt-1" title="Turn this device off during feeding?">Off During Feeding</label>
                                                 			<select id="feedCommand" name="feedCommand" class="form-control">
 										<option></option>
 									<?php	
@@ -149,7 +149,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
-		                                                    <label class="mt-1">Off During Cleaning</label>
+		                                                    <label class="mt-1" title="Turn this device off during cleaning?">Off During Cleaning</label>
                                                 			<select id="cleanCommand" name="cleanCommand" class="form-control">
 										<option></option>
 									<?php	
@@ -164,7 +164,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
-		                                                    <label class="mt-1">Always On</label>
+		                                                    <label class="mt-1" title="Ensure the outlet is on unless specified above">Always On</label>
                                                 			<select id="AOCommand" name="AOCommand" class="form-control">
 										<option></option>
 									<?php	
