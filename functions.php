@@ -6,7 +6,6 @@ if (isset($_GET['debug'])) {
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 }
-$calendarDate = date("Y-m-d h:i");
 # This "if" must be first so login happens the first time
 if (isset($_POST['email']) && isset($_POST['password'])){
   if ($_POST['email'] == $site_settings['username'] ){
@@ -70,6 +69,12 @@ function correctTZEpoch($dateString, $tz) {
   $real_date->setTimeZone(new DateTimeZone('UTC'));
   return $real_date->format('U');
 }
+function correctAttTZ($dateString, $tz) {
+  $real_date = new DateTime($dateString, new DateTimeZone('UTC'));
+  $real_date->setTimeZone(new DateTimeZone($tz));
+  return $real_date->format('Y-m-d H:i');
+}
+$calendarDate = correctAttTZ(date("Y-m-d H:i"), $site_settings['tz']);
 $graphLimit = explode(",", $site_settings['graphLimit']);
 
 # Store alets
