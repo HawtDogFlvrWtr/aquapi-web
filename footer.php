@@ -38,21 +38,22 @@
                 <h5 class="m-0">Settings</h5>
             </div>
 
-            <div class="slimscroll-menu">
+            <div class="slimscroll-menu rightbar-content">
 
                 <!-- Settings -->
 		<div class="mt-2 pl-2 pr-2">
-			<div class="form-group mb-3">
-				<label>Feed time (Mins.)</label>
-				<input data-toggle="touchspin" type="text" value="<?php echo $site_settings['feedTime'] / 60;?>">
+			<form method="POST">
+			<h5 class="pl-2">Feed time (Mins.)</h5>
+			<div class="pl-2 mb-3">
+				<input id="feed" name="feed" data-toggle="touchspin" type="text" value="<?php echo $site_settings['feedTime'] / 60;?>">
 			</div>
-			<div class="form-group mb-3">
-				<label>Clean time (Mins.)</label>
-				<input data-toggle="touchspin" type="text" value="<?php echo $site_settings['cleanTime'] / 60;?>">
+			<h5 class="pl-2">Clean time (Mins.)</h5>
+			<div class="pl-2 mb-3">
+				<input id="clean" name="clean" data-toggle="touchspin" type="text" value="<?php echo $site_settings['cleanTime'] / 60;?>">
 			</div>
-			<div class="form-group mb-3">
-				<label>Default Graph Limit</label>
-	                        <select class="form-control" id="limit-select" name="limit">
+			<h5 class="pl-2">Default Graph Limit</h5>
+			<div class="pl-2 mb-3">
+	                        <select class="form-control" id="graph" name="graph">
 					  <?php 
 					    foreach ($graphLimit as $key => $value) { 
 						$graphLimitSplit = explode(":", $value);
@@ -69,9 +70,9 @@
 					  ?>
 	                        </select>
 			</div>
-			<div class="form-group mb-3">
-				<label>Your Timezone</label>
-	                        <select class="form-control" id="limit-select" name="limit">
+			<h5 class="pl-2">Your Timezone</h5>
+			<div class="pl-2 mb-3">
+	                        <select class="form-control" id="tz" name="tz">
 					<?php 
 					    $tzArray = timezone_identifiers_list();
 					    foreach ($tzArray as $key => $value) { 
@@ -85,19 +86,19 @@
 					  ?>
 	                        </select>
 			</div>
-			<div class="form-group mb-3">
-				<label>Username</label>
-				<input type="email" id="example-email" name="username" class="form-control" placeholder="Email" value="<?PHP echo $site_settings['username'];?>">
+			<h5 class="pl-2">Username</h5>
+			<div class="pl-2 mb-3">
+				<input type="email" id="username" name="username" class="form-control" placeholder="Email" value="<?PHP echo $site_settings['username'];?>">
 				
 			</div>
-			<div class="form-group mb-3">
-				<label for="password">Password</label>
+			<h5 class="pl-2">Password</h5>
+			<div class="pl-2">
 				<input type="password" id="password" name="password" class="form-control" value="">
 			</div>
-			<div class="form-group mb-3">
-
+			<div class="pl-2 text-center">
+				<button id="submit" type="submit" class="btn btn-primary mt-2 mb-2">Save</button>
 			</div>
-
+		</form>
                 </div>
             </div>
         </div>

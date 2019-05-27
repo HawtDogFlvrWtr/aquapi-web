@@ -189,4 +189,18 @@ if (isset($_POST['single-metric-value']) && isset($_POST['single-metric-date']) 
   exit();
 }
 
+# Updating the settings
+if ( isset($_POST['feed']) && isset($_POST['clean']) && isset($_POST['graph']) && isset($_POST['tz']) && isset($_POST['username']) && isset($_POST['password']) ) {
+		$feed = $conn->real_escape_string($_POST['feed']) * 60;
+		$clean = $conn->real_escape_string($_POST['clean']) * 60 ;
+		$graph = $conn->real_escape_string($_POST['graph']);
+		$newTZ = $conn->real_escape_string($_POST['tz']);
+		$username = $conn->real_escape_string($_POST['username']);
+		$password = md5($conn->real_escape_string($_POST['password']));
+		$conn->query("UPDATE settings SET tz = '".$newTZ."', defaultGraphLimit = '".$graph."', cleanTime = '".$clean."', username = '".$username."', user_password = '".$password."', feedTime = '".$feed."'");
+		msgBox("Site settings have been updated successfully.", "success");	
+ 		header("Location: ".basename($_SERVER['PHP_SELF']));
+  		exit();
+}
+
 ?>

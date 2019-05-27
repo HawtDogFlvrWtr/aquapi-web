@@ -11,6 +11,36 @@ include '/var/www/html/functions.php';
 
 while(true) {
   try {	
+	// Get Settings Data
+	$setSql = "
+          SELECT
+                dashboard_update,
+                tz,
+		graphLimit,
+		defaultGraphLimit,
+		performAction,
+		pumpStatus,
+		lightStatus,
+		username,
+		user_password,
+		sessionId,
+		light_override,
+		pump_override,
+		tempScale,
+		feedTime,
+		cleanTime,
+		ecobeeAPI,
+		ecobeePIN,
+		ecobeeAccess,
+		ecobeeRefresh,
+		ecobeeTokenType,
+		ecobeeAuthCode,
+		version
+          FROM
+                settings
+	";
+	$result = $conn->query($setSql);
+	$site_settings = $result->fetch_assoc() or die('-99'.mysqli_error());
 	# Handle feed and always on
 	$outletEntriesAO = $conn->query("SELECT * FROM outlet_entries WHERE alwaysOn = 1");
 	while ($row = $outletEntriesAO->fetch_assoc()) {

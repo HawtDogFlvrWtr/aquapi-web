@@ -25,7 +25,6 @@ $setSql = "
                 tz,
 		graphLimit,
 		defaultGraphLimit,
-		api_key,
 		performAction,
 		pumpStatus,
 		lightStatus,
