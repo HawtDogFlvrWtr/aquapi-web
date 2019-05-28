@@ -220,7 +220,7 @@ include 'header.php';
  			    <?php
 			      while($row = $graphs->fetch_assoc()) {
 			    ?>
-                            <div class="col-xl-4">
+                            <div class="col-6">
                                 <div class="card">
                                     <div class="card-body">
 					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title mb-4"><?php echo $row['eventName'];?> Chart</h4>
