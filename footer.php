@@ -243,8 +243,8 @@
                                                                   data: values,
                                                                   pointRadius: 0,
                                                                   pointBackgroundColor: metricColor,
-                                                                  //backgroundColor: "#39afd1",
-								  borderColor: metricColor,
+                                                                  backgroundColor: metricColor,
+								  //borderColor: metricColor,
                                                                   borderWidth:1 
                                                           }]
                                                        },

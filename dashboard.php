@@ -51,7 +51,7 @@ include 'header.php';
                 	                            </a>
 						</div>
                                                 <h5 id="single-metric-title" class="text-muted font-weight-normal mt-3" title="Current tank temperature"><?php echo str_replace("_", " ", $row['eventName']) ?></h5>
-                                                <p id="<?php echo $row['eventName'] ?>-single-metric" class="text-nowrap display-4 mt-1 mb-1"></p>
+						<p style="color:<?php echo $row['lineColor'];?>" id="<?php echo $row['eventName'] ?>-single-metric" class="text-nowrap display-4 mt-1 mb-1"></p>
                                                 <h5 class="mb-0 text-muted">
                                                     <span id="<?php echo $row['eventName'] ?>-single-metric-date" class="text-nowrap">Loading..</span>
                                                 </h5>
