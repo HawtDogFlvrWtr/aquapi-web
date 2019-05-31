@@ -18,7 +18,15 @@ if (isset($_GET['metric']) && isset($_GET['value'])) {
 	$serial = $conn->real_escape_string($_GET['serial']);
 	$firmware = $conn->real_escape_string($_GET['firmware']);
 	$moduleType = $conn->real_escape_string($_GET['module']);
-	$status = explode(",",$conn->real_escape_string($_GET['status']));
+	if (strpos(",", $conn->real_escape_string($_GET['status']))) {
+		$status = explode(",",$conn->real_escape_string($_GET['status']));
+	} else {
+		$status = array();
+		$charArray = str_split($_GET['status']);
+		foreach ($charArray as $char) {
+			$status[] = $char;
+		}
+	}
 	$epoch = time();
 	$checkQuery = $conn->query("SELECT moduleSerial, id from module_entries where moduleSerial = '".$serial."'");
 	if (mysqli_num_rows($checkQuery) > 0) {
