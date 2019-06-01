@@ -8,9 +8,14 @@ if (isset($_GET['debug'])) {
 
 include '/var/www/html/config.php';
 include '/var/www/html/functions.php';
+$feedTimer = $site_settings['feedTime'];
+function updateDB($conn, $moduleId, $outletId, $paramId, $value) {
+	$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleId.", ".$outletId.", ".$paramId.", '".$value."')");
+}
 
 function changePort($ip, $portNum, $value) {
 	$portNum = $portNum - 1;
+	echo "Telling $ip/$portNum to turn $value \n";
 	$url = 'http://admin:seven8910@'.$ip.'/restapi/relay/outlets/'.$portNum.'/state/';
 	if ($value == 'ON') {
 		$value = 'true';
@@ -24,7 +29,6 @@ function changePort($ip, $portNum, $value) {
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
 	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 	$response = curl_exec($ch);
-	var_dump($response);
 }
 
 while(true) {
@@ -59,6 +63,10 @@ while(true) {
 	";
 	$result = $conn->query($setSql);
 	$site_settings = $result->fetch_assoc() or die('-99'.mysqli_error());
+	if ($feedTimer != $site_settings['feedTime']) {
+		echo "Feed timer change from $feedTimer to ".$site_settings['feedTime']."\n";
+	}
+	$feedTimer = $site_settings['feedTime'];
 	# Handle feed and always on
 	$outletEntriesAO = $conn->query("SELECT * FROM outlet_entries WHERE alwaysOn = 1");
 	while ($row = $outletEntriesAO->fetch_assoc()) {
@@ -67,26 +75,31 @@ while(true) {
 		$outletTriggerParam = $row['outletTriggerParam'];
 		$moduleInfoAO = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
 		$moduleInfoReturnAO = $moduleInfoAO->fetch_assoc();
-		if ($row['offAtFeeding'] == 1 && $returnValue['value'] == 0) { // turn it back on if feeding is over but the outlet is off.
-			if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
-				#Turn outlet on that's supposed to be on but isn't. This will help on first boot.
-				changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
-				#file_get_contents("http://admin:seven8910@".$moduleInfoReturnAO['moduleAddress']."/outlet?".$row['portNumber']."=ON");
-				echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
-			}
-		} else if ($row['offAtFeeding'] == 1 && $returnValue['value'] == 1) {
-			$currentTime = time();
-			$recordTime = correctTZEpoch($returnValue['timestamp'], $site_settings['tz']);
-			echo "recordTime: ".$recordTime." ".$currentTime."\n";
-			if ($recordTime + $site_settings['feedTime'] < $currentTime) {	// Check if feeding time is over.
-				$conn->query("INSERT INTO parameter_entries (type_id, value) VALUES (26, 0)"); // Set that feeding is over.
-				echo("Feeding Ended");
+		if ($row['offAtFeeding'] == 1) {
+			if ($returnValue['value'] == 0) { // turn it back on if feeding is over but the outlet is off.
+				if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
+					#Turn outlet on that's supposed to be on but isn't. This will help on first boot.
+					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
+					#echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
+					echo("Feeding Ended. Starting outlets\n");
+				}
+			} else {
+				if ($row['outletStatus'] == 1) {
+					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'OFF');
+					echo("Feeding Starting\n");
+				}
+				$currentTime = time();
+				$recordTime = correctTZEpoch($returnValue['timestamp'], $site_settings['tz']);
+				echo "recordTime: ".$recordTime." ".$currentTime."\n";
+				if ($recordTime + $site_settings['feedTime'] < $currentTime) {	// Check if feeding time is over.
+					$conn->query("INSERT INTO parameter_entries (type_id, value) VALUES (26, 0)"); // Set that feeding is over.
+					echo("Feeding Ended. Updating the DB\n");
+				}
 			}
 		} else if ($row['offAtFeeding'] == 0) {
 			if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
 				# Turn outlet on that's supposed to be on but isn't. This will help on first boot.
 				changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
-				#file_get_contents("http://admin:seven8910@".$moduleInfoReturnAO['moduleAddress']."/outlet?".$row['portNumber']."=ON");
 				echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
 			}
 
@@ -102,11 +115,14 @@ while(true) {
 			$row['outletStatus'] = 'ON';
 		}
 		$outletTriggerTest = $row['outletTriggerTest'];
-		$outletTriggerCommand = strtolower($row['outletTriggerCommand']);
-		if ($outletTriggerCommand == 'on') {
+		$outletTriggerCommand = strtoupper($row['outletTriggerCommand']);
+		#echo "Outlet trigger command is $outletTriggerCommand\n";
+		if ($outletTriggerCommand == 'ON') {
 			$outletTriggerCommandOpposite = 'OFF';
+			#echo "Opp is Off\n";
 		} else {
 			$outletTriggerCommandOpposite = 'ON';
+			#echo "Opp is On\n";
 		}
 		$outletTriggerParam = $row['outletTriggerParam'];
 		$outletTriggerValue = $row['outletTriggerValue'];
@@ -116,87 +132,75 @@ while(true) {
 		$returnValue = $returnValueQuery->fetch_array();
 		if ($outletTriggerTest == ">") {
 			if ($returnValue['value'] > $outletTriggerValue) {
-				echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n";
+				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n";
 				if ($row['outletStatus'] != $outletTriggerCommand) {
 					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommand);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
 				}
 			} else {
-				echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommandOpposite);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
+					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
 				}
 			}
 		} elseif ($outletTriggerTest == "<") {
 			if ($returnValue['value'] < $outletTriggerValue) {
-				echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommand) {
 					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommand);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
 				}
 			} else {
-				echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommandOpposite);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
+					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
 				}
 			}
 
 		} elseif ($outletTriggerTest == ">=") {
 			if ($returnValue['value'] >= $outletTriggerValue) {
-				echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				echo "INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", ".$outletTriggerCommand.")\n";
+				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommand) {
 					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommand);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
 				}
 			} else {
-				echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				echo "INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", ".$outletTriggerCommandOpposite.")\n";
+				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommandOpposite);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
+					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
 				}
 			}
 
 		} elseif ($outletTriggerTest == "<=") {
 			if ($returnValue['value'] <= $outletTriggerValue) {
-				echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommand) {
 					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommand);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
 				}
 			} else {
-				echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommandOpposite);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
+					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
 				}
 			}
 
 		} elseif ($outletTriggerTest == "=") {
 			if ($returnValue['value'] == $outletTriggerValue) {
-				echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommand) {
 					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommand);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommand."')");
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
 				}
 			} else {
-				echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
+				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
 				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					#file_get_contents("http://admin:seven8910@".$moduleInfoReturn['moduleAddress']."/outlet?".$row['portNumber']."=".$outletTriggerCommandOpposite);
-					$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleInfoReturn['id'].",".$row['portNumber'].", ".$outletTriggerParam.", '".$outletTriggerCommandOpposite."')");
+					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
+					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
 				}
 			}
 

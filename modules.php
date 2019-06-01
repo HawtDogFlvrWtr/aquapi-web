@@ -43,6 +43,9 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                                     <div class="col-lg-2">
 				    <div class="card widget-flat text-center">
 					    <div class="card-body">
+						<div class="text-muted dropdown float-left">
+							<b class="display-5"><?php echo $portRow['portNumber'];?></b>
+						</div>
 						<div class="text-muted dropdown float-right">
 						    <a id="<?php echo $portRow['portNumber'];?>" href="#" class="card-drop" data-toggle="modal" data-target="#outlet<?php echo $portRow['moduleId'];?>-port<?php echo $portRow['portNumber'];?>" aria-expanded="false">
         	                                        <i title="Configure Outlet" class="mdi mdi-settings"></i>
@@ -51,7 +54,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 						<div class="mt-3">
 						<p id="outlet-divider<?php echo $portRow['portNumber'] ?>" class="display-4 mt-1 mb-1"></p>
 						<a id="outlet-icon-<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" href="#">
-							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-2 mdi <?php echo $icon;?>"></i>
+							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-4 mdi <?php echo $icon;?>"></i>
 						
 						</a>
 						</div>
