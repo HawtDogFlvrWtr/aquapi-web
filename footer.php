@@ -182,6 +182,8 @@
                                                   var values = jsonData.jsonarray.map(function(e) {
                                                     return e.value;
 						  });
+						  var minChart = Math.min.apply(Math, values);
+						  var maxChart = Math.max.apply(Math, values);
 						  if (jsonData.annoList) {
 						     if (Object.keys(jsonData.annoList).length >= 1) {
 							  var annoList = jsonData.annoList;
@@ -226,6 +228,11 @@
 						  	     //}
 							   }],
 							   yAxes: [{
+							     ticks: {
+								min: minChart,
+								max: maxChart,
+								stepSize:20
+						  	     },
 							     gridLines: {
 							       display: true
 							     },
