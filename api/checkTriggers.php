@@ -92,7 +92,7 @@ while(true) {
 				$recordTime = correctTZEpoch($returnValue['timestamp'], $site_settings['tz']);
 				echo "recordTime: ".$recordTime." ".$currentTime."\n";
 				if ($recordTime + $site_settings['feedTime'] < $currentTime) {	// Check if feeding time is over.
-					$conn->query("INSERT INTO parameter_entries (type_id, value) VALUES (26, 0)"); // Set that feeding is over.
+					$conn->query("INSERT INTO parameter_entries (type_id, value) VALUES (".$returnValue['type_id'].", 0)"); // Set that feeding is over.
 					echo("Feeding Ended. Updating the DB\n");
 				}
 			}

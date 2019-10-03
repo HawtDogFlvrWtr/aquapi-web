@@ -61,13 +61,10 @@ include 'functions.php';
                                             <input type="checkbox" class="custom-control-input" id="checkbox-signin" checked>
                                             <label class="custom-control-label" for="checkbox-signin">Remember me</label>
                                         </div>
-                                    </div>
-
-                                    <div class="form-group mb-0 text-center">
-                                        <button class="btn btn-primary" type="submit"> Log In </button>
-                                        <a class="btn btn-info" href="guest.php"> Guest Login </a>
-                                    </div>
-
+				    </div>
+				    <div class="form-group mb-0 text-center">
+					<button class="btn btn-primary" type="submit"> Log In </button>
+				    </div>
                                 </form>
                             </div> <!-- end card-body -->
                         </div>

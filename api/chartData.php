@@ -58,9 +58,7 @@ if (isset($_GET['check'])) {
 			$trans = "4";
 		}
 		$annArr['annotations'][] = array(
-			#"drawTime" => "afterDatasetsDraw",
 			"drawTime" => "beforeDatasetsDraw",
-			#"id" => $value['id'],
 			"type" => "box",
 			"mode" => "vertical",
 			"xScaleID" => "x-axis-0",
@@ -72,9 +70,6 @@ if (isset($_GET['check'])) {
 			"endValue" => $endValue,
 			"borderColor" => "rgba($r, $g, $b,$trans)", 
 			"borderWidth" => 1,
-			#"borderDash" => $annoColor2['typeLine'],
-			#"label" => [ "content" => $annoColor2['outletType'], "fontColor" => "#000", "backgroundColor" => $annoColor2['typeColor'], "xPadding" => "6", "fontStyle" => "bold", "fontSize" => "8", "position" => $position, "enabled" => true,],
-			#"onMouseover" => [function(e) { var element = this; element.options.borderWidth=7; element.options.label.enabled = true; element.options.label.content = e.type; element.chartInstance.update(); element.chartInstance.chart.canvas.style.cursor = 'pointer'; };],
 		);
 	  }
   }
