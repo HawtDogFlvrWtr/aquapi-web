@@ -27,13 +27,14 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 					if ($portDetailsAssoc['id'] != 0) {
 						$icon = $portDetailsAssoc['typeIcon'];
 					} else {
-						$icon = $portRow['outletIcon'];
+						#$icon = $portRow['outletIcon'];
+						$icon = 'mdi-close-circle-outline';
 					}
 					if ($portRow['outletNote'] == "") {
 						if ($portDetailsAssoc['outletType'] != "") {
 							$note = $portDetailsAssoc['outletType'];
 						} else {
-							$note = "None";
+							$note = "Not configured";
 						}
 					} else {
 						$note = $portRow['outletNote'];
@@ -53,10 +54,10 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 						</div>
 						<div class="mt-3">
 						<p id="outlet-divider<?php echo $portRow['portNumber'] ?>" class="display-4 mt-1 mb-1"></p>
-						<a id="outlet-icon-<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" href="#">
+<!--						<a id="outlet-icon-<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" href="#">a -->
 							<i title="updating..." id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'] ?>" class="text-secondary display-4 mdi <?php echo $icon;?>"></i>
 						
-						</a>
+						<!--</a>-->
 						</div>
 							<h6 class="text-nowrap"><?php echo $note;?></h6>
                                             </div> <!-- end card-body-->

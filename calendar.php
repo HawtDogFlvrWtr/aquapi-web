@@ -6,7 +6,7 @@ include 'header.php';
                         
                         <!-- start page title -->
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-9">
                                 <div class="page-title-box">
                                     <h4 class="page-title">Tank Maintenance Calendar</h4>
                                 </div>
@@ -14,7 +14,7 @@ include 'header.php';
                         </div>
                         <!-- end page title -->
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-xl-9">
 
                                 <div class="card">
                                     <div class="card-body">

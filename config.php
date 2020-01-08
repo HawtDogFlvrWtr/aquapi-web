@@ -36,12 +36,6 @@ $setSql = "
 		tempScale,
 		feedTime,
 		cleanTime,
-		ecobeeAPI,
-		ecobeePIN,
-		ecobeeAccess,
-		ecobeeRefresh,
-		ecobeeTokenType,
-		ecobeeAuthCode,
 		version
           FROM
                 settings

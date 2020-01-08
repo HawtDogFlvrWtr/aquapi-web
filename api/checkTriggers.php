@@ -51,12 +51,6 @@ while(true) {
 		tempScale,
 		feedTime,
 		cleanTime,
-		ecobeeAPI,
-		ecobeePIN,
-		ecobeeAccess,
-		ecobeeRefresh,
-		ecobeeTokenType,
-		ecobeeAuthCode,
 		version
           FROM
                 settings
@@ -103,6 +97,20 @@ while(true) {
 				echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
 			}
 
+		}
+	}
+
+	# Handle unused outlets
+	$outletUnusedEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerTest = '' AND outletTriggerCommand = '' AND outletTriggerParam = 0 AND alwaysOn = 0");
+	while ($row = $outletUnusedEntries->fetch_assoc()) {
+		if ($row['outletStatus'] == 1) {
+			$outletTriggerParam = $row['outletTriggerParam'];
+			$moduleInfo = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
+			$moduleInfoReturn = $moduleInfo->fetch_assoc();
+			$outletTriggerCommand = 'OFF';
+			$outletTriggerParam = 0;
+			changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
+			updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
 		}
 	}
 
