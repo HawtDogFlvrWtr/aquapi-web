@@ -3,7 +3,7 @@ define('INCLUDE_CHECK',true);
 
 include '../config.php';
 include '../functions.php';
-$devices = array('light','pump','weather');
+$devices = array('light','pump','weather', 'heater');
 if (isset($_GET['check'])) {
   if ($_GET['check'] != "") {
 	$check = $conn->real_escape_string($_GET['check']);
@@ -26,11 +26,20 @@ if (isset($_GET['check'])) {
   }
   echo json_encode($rows);
 } elseif(isset($_GET['devices'])) {
-  if (isset($_GET['devices']) && in_array($_GET['devices'], $devices)) {
-    $newDeviceName = $_GET['devices']."Status";
-    $device = $conn->real_escape_string($newDeviceName);
-    echo $site_settings[$device];
-  }
+	$outletArray = [];
+	$outletTypes = $conn->query("SELECT id, outletType, typeIcon FROM outlet_types");
+	while ($r = $outletTypes->fetch_assoc()) {
+		$id = $r['id'];
+		$type = $r['outletType'];
+		$icon = $r['typeIcon'];
+		$queryOutlets = $conn->query("SELECT count(id) as count FROM outlet_entries WHERE outletType = $id AND outletStatus = 1");
+		$count = $queryOutlets->fetch_assoc();
+		$count = $count['count'];
+		if ($count > 0) {
+			$outletArray[] = "<i title='$type Status' id='$type' class='ml-1 text-success mdi $icon noti-icon'></i>";
+		}
+	}
+	echo implode(" ", $outletArray);
 } else {
   echo "You're missing something";
 }

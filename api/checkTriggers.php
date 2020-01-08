@@ -10,7 +10,12 @@ include '/var/www/html/config.php';
 include '/var/www/html/functions.php';
 $feedTimer = $site_settings['feedTime'];
 function updateDB($conn, $moduleId, $outletId, $paramId, $value) {
-	$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleId.", ".$outletId.", ".$paramId.", '".$value."')");
+	# Check if we already inserted this less than a minute ago.
+	$result = $conn->query("SELECT count(id) as count FROM outlet_trigger_entries WHERE moduleId = $moduleId AND outletId = $outletId AND paramId = $paramId AND value = '$value' AND timestamp > date_sub(now(), interval 1 minute)");
+	$count = $result->fetch_assoc() or die('-99'.mysqli_error());
+	if ($count['count'] < 1) {
+		$conn->query("INSERT INTO outlet_trigger_entries (moduleId, outletId, paramId, value) VALUES (".$moduleId.", ".$outletId.", ".$paramId.", '".$value."')");
+	}
 }
 
 function changePort($ip, $portNum, $value) {

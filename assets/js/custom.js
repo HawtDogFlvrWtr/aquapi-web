@@ -38,23 +38,12 @@
 					    if (metricName != 'logout') { // Don't pull logout as a device or metric
 	                                    $.get(`api/singleValue.php?${apiHit}=${metricName}`, function (data) {
 					      if (metricName == 'Temperature') {
-						json = JSON.parse(data);
-						var temperature = json[0].value
-						$(`#${metricName}`).text(temperature).append("&#176;"); 
+						      json = JSON.parse(data);
+						      var temperature = json[0].value;
+						      $(`#${metricName}`).text(temperature).append("&#176;");
 					      }
-					      if (metricName == 'light') {
-						if (data == 1) {
-	                	                      	$(`#${metricName}`).css({ "color": "#ffbc00"});
-						} else {
-	                	                      	$(`#${metricName}`).css({ "color": "#313a46"});
-						}
-					      }
-					      if (metricName == 'pump') {
-						if (data == 1) {
-	                	                      	$(`#${metricName}`).css({ "color": "#0acf97"});
-						} else {
-	                	                      	$(`#${metricName}`).css({ "color": "#fa5c7c"});
-						}
+					      if (apiHit == 'devices') {
+						      $('#device-list').html(data);
 					      }
 					      if (metricName == 'weather') {
 						if (data == 'resume') {
