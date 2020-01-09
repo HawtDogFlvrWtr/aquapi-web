@@ -71,7 +71,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
                                	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                        	            </div>
                                                	    <div class="modal-body">
-							<form action="modules.php" method="post">
+							<form id="port<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>" action="modules.php" method="post">
 							  <div class="form-group mb-3">
 								<div class="form-group mb-3">
 									<div class="card">
@@ -185,6 +185,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 									</select>
                                 		                </div>
 							    <input type="hidden" name="outletId" id="outletId" value="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>">
+							    <button id="clear_<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>" type="button" class="float-left btn btn-warning mt-2 mb-2">Clear</button>
 							    <button id="submit" type="submit" class="float-right btn btn-secondary mt-2 mb-2">Submit</button>
 							  </div>
 							</form>
@@ -206,5 +207,17 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 			<?php
 			  include 'footer.php';
 			?>
+		    <script>
+			$("[id^=clear_]").click(function() {
+				var idCap = $(this).attr('id');
+				var portInfo = idCap.split("_");
+				$(':input', '#port'+portInfo[1])
+					.not(':button, :submit, :reset, :hidden')
+					.val('')
+					.removeAttr('checked')
+					.removeAttr('selected')
+				//$('#port'+portInfo[1]).trigger("reset");
+			});
+		    </script>
 		    <script src="assets/js/outlets.js"></script>
 
