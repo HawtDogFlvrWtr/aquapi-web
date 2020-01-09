@@ -139,6 +139,25 @@ if (!$wcRecord['timestamp']) {
                        	                </div><!-- /.modal -->
                         	</div>
 	                        <!-- end row -->
+                           <div class="row">
+ 			    <?php
+			      while($row = $graphs->fetch_assoc()) {
+			    ?>
+                            <div class="col-xl-6">
+                                <div class="card">
+				    <div class="card-body">
+					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title"><?php echo $row['eventName'];?> Chart</h4>
+                                        <div id="chart-<?php echo $row['eventName'];?>" class="chartjs-chart" style="min-height: 150px;">
+                                            <canvas id="line-chart-<?php echo $row['eventName'];?>"></canvas>
+					</div>
+					<div id="annoLegend-<?php echo $row['eventName'];?>" class="float-left"></div>
+                                    </div> <!-- end card body-->
+                                </div> <!-- end card -->
+                            </div><!-- end col-->
+			    <?php
+			    }
+			    ?>
+			    </div>
 
                             </div> <!-- end col -->
                             <div class="col-xl-3">
@@ -200,7 +219,7 @@ if (!$wcRecord['timestamp']) {
                                         </div>
                                         <h4 class="header-title mb-2">Recent Maintenance</h4>
 
-                                        <div class="slimscroll" style="max-height: 275px;">
+                                        <div class="slimscroll" style="max-height: 700px;">
                                             <div class="timeline-alt pb-0">
 						<?php
 						while($row = $maintenanceList->fetch_assoc()) {
@@ -229,30 +248,6 @@ if (!$wcRecord['timestamp']) {
 			    <!--endcol -->
                         </div>
 			<!-- end row -->
-                        <div class="row">
-                         <div class="col-12">
-                           <div class="row">
- 			    <?php
-			      while($row = $graphs->fetch_assoc()) {
-			    ?>
-                            <div class="col-xl-4">
-                                <div class="card">
-				    <div class="card-body">
-					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title"><?php echo $row['eventName'];?> Chart</h4>
-                                        <div id="chart-<?php echo $row['eventName'];?>" class="chartjs-chart" style="min-height: 150px;">
-                                            <canvas id="line-chart-<?php echo $row['eventName'];?>"></canvas>
-					</div>
-					<div id="annoLegend-<?php echo $row['eventName'];?>" class="float-left"></div>
-                                    </div> <!-- end card body-->
-                                </div> <!-- end card -->
-                            </div><!-- end col-->
-			    <?php
-			    }
-			    ?>
-			    </div>
-			  </div>
-			</div>
-                        <!-- end row -->
                     </div> <!-- container -->
 			<?php
 			  include 'footer.php';
