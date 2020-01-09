@@ -1,5 +1,12 @@
 <?php
 include 'header.php';
+$wcQuery = $conn->query("SELECT timestamp FROM tankkeeping_entries WHERE type_id = 2 ORDER BY id DESC LIMIT 1");
+$wcRecord = $wcQuery->fetch_assoc();
+if (!$wcRecord['timestamp']) {
+	$wcRecord = 'No water change has been performed yet.';
+} else {
+	$wcRecord = correctTZ($wcRecord['timestamp'], $site_settings['tz']);
+}
 ?>                    
                     <!-- Start Content-->
                     <div class="container-fluid">
@@ -136,6 +143,12 @@ include 'header.php';
                             </div> <!-- end col -->
                             <div class="col-xl-3">
                                 <div class="card">
+				    <div class="card-body">
+					<h4 id="WC-title" class="header-title">Last Water change</h4>
+					<span class="text-warning"><?php echo $wcRecord;?></span>
+                                    </div> <!-- end card body-->
+                                </div> <!-- end card -->
+                                <div class="card">
                                     <div class="card-body">
 					<div class="dropdown float-right">
                                             <a href="#" class="dropdown-toggle arrow-none card-drop" data-toggle="dropdown" aria-expanded="false">
@@ -225,8 +238,8 @@ include 'header.php';
                             <div class="col-xl-4">
                                 <div class="card">
 				    <div class="card-body">
-					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title mb-4"><?php echo $row['eventName'];?> Chart</h4>
-                                        <div id="chart-<?php echo $row['eventName'];?>" class="mt-3 chartjs-chart" style="min-height: 150px;">
+					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title"><?php echo $row['eventName'];?> Chart</h4>
+                                        <div id="chart-<?php echo $row['eventName'];?>" class="chartjs-chart" style="min-height: 150px;">
                                             <canvas id="line-chart-<?php echo $row['eventName'];?>"></canvas>
 					</div>
 					<div id="annoLegend-<?php echo $row['eventName'];?>" class="float-left"></div>

@@ -116,25 +116,5 @@ include 'functions.php';
                         </button>
                     </div>
 		<?php 
-			msgBoxDisplay(); 
-			# ECOBEE STUFF
-			if ($site_settings['ecobeePIN'] != "" && $site_settings['ecobeeRefresh'] == ""){ ?>
-				<div id="ecobee" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h4 class="modal-title" id="myModalLabel">Ecobee Configuration</h4>
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							</div>
-							<div class="modal-body">
-							<p>Please enter the pin "<?php echo $site_settings['ecobeePIN'];?>" on the ecobee development website to finish the configuration process.</p>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-light" data-dismiss="modal">Done</button>
-							</div>
-						</div>
-					</div>
-				</div>
-
-		<?php } ?>
-                    <!-- end Topbar -->
+				msgBoxDisplay(); 
+		?>
