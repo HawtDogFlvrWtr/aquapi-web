@@ -65,6 +65,11 @@ function correctTZInsert($dateString, $tz) {
   $real_date->setTimeZone(new DateTimeZone('UTC'));
   return $real_date->format('y/m/d H:i:s');
 }
+function correctTZQuery($dateString, $tz) {
+  $real_date = new DateTime($dateString, new DateTimeZone($tz));
+  $real_date->setTimeZone(new DateTimeZone('UTC'));
+  return $real_date->format('Y-m-d H:i');
+}
 function correctTZEpoch($dateString, $tz) {
   $real_date = new DateTime($dateString, new DateTimeZone('UTC'));
   $real_date->setTimeZone(new DateTimeZone('UTC'));
