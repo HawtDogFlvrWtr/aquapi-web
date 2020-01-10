@@ -98,8 +98,8 @@ class AtlasI2C:
 
 		
 def main():
+    while True:
 	device = AtlasI2C() 	# creates the I2C port object, specify the address or bus if necessary
-	
 	# main loop
 	devices = device.list_i2c_devices()
 	for i in range(len (devices)):
@@ -113,6 +113,7 @@ def main():
                     print sendVal
                 except:
                     print "Error pushing value"
+        time.sleep(10)
 
 
 
