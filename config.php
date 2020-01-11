@@ -5,9 +5,9 @@ if(!defined('INCLUDE_CHECK')) die('You are not allowed to execute this file dire
 /* Database config */
 
 $db_host		= 'localhost';
-$db_user		= 'aquapi';
-$db_pass		= 'aquapi';
-$db_database		= 'aquapi'; 
+$db_user		= 'aquapi'; # CHANGE THIS!!!
+$db_pass		= 'aquapi'; # CHANGE THIS!!!
+$db_database		= 'aquapi'; # CHANGE THIS!!!
 
 /* End config */
 
