@@ -24,7 +24,7 @@
                                 	    	};
 				    	});
                                   }
-                                  setInterval(captureCards, 30000);
+                                  setInterval(captureCards, 10000);
                                   captureCards();
 
                                   function captureDevices() {
@@ -72,7 +72,7 @@
 				            }
 				    });
                                   }
-                                  setInterval(captureDevices, 30000);
+                                  setInterval(captureDevices, 10000);
                                   captureDevices();
 		
 

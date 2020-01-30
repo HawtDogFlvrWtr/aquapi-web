@@ -48,6 +48,11 @@ if (!$wcRecord['timestamp']) {
                                 <div class="row">
  				<?php
 				while($row = $singleMetric->fetch_assoc()) {
+					if ($row['max'] > 0) {
+						$maxVal = 'data-bts-max="'.$row['max'].'"';
+					} else {
+						$maxVal = '';
+					}	
 				?>
                                     <div class="col-lg-3">
                                         <div class="card widget-flat text-center">
@@ -82,7 +87,7 @@ if (!$wcRecord['timestamp']) {
 								</div>
 								<div class="form-group mb-3">
 		                                                    <label>New value</label>
-                		                                    <input type="text" id="<?php echo $row['eventName'];?>-single-metric-modal" name="single-metric-value" value="">
+								    <input <?php echo $maxVal;?> type="text" id="<?php echo $row['eventName'];?>-single-metric-modal" name="single-metric-value" value="">
                                 		                </div>
 							    <input type="hidden" name="smetric-type[]" id="smetric-type<?php echo $row['type_id'];?>" value="<?php echo $row['type_id'];?>">
 							    <button id="submitsmetric<?php echo $row['type_id'];?>" type="submit" class="btn btn-primary mt-2 mb-2">Submit</button>
@@ -161,6 +166,15 @@ if (!$wcRecord['timestamp']) {
 
                             </div> <!-- end col -->
                             <div class="col-xl-3">
+                                <div class="card">
+				    <div class="card-body">
+					<h4 id="devices-title" class="header-title">Running Devices</h4>
+						<ul class="list-unstyled mb-0">
+						 <li id="device-list">
+						 </li>
+						<ul>
+                                    </div> <!-- end card body-->
+                                </div> <!-- end card -->
                                 <div class="card">
 				    <div class="card-body">
 					<h4 id="WC-title" class="header-title">Last Water change</h4>

@@ -14,7 +14,7 @@ include 'header.php';
                         </div>
                         <!-- end page title -->
                         <div class="row">
-                            <div class="col-xl-9">
+                            <div class="col-xl-12">
 
                                 <div class="card">
                                     <div class="card-body">

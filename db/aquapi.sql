@@ -28,7 +28,8 @@ CREATE TABLE `module_types` (
   `featureCount` int(11) NOT NULL,
   `defaultIcon` varchar(255) NOT NULL,
   `parameterId` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`moduleTypeName`,`featureCount`,`defaultIcon`,`parameterId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -64,7 +65,7 @@ CREATE TABLE `outlet_types` (
 
 LOCK TABLES `outlet_types` WRITE;
 /*!40000 ALTER TABLE `outlet_types` DISABLE KEYS */;
-INSERT INTO `outlet_types` VALUES (1,'Heater','mdi-oil-temperature','#f82b54'),(2,'ATO','mdi-water-percent','#727cf5'),(3,'Powerhead','mdi-waves','#2991ae'),(4,'Pump','mdi-loop','#00ffdd'),(5,'Skimmer','mdi-chart-bubble','#6610f2'),(6,'UV Light','mdi-lightbulb-outline','#6f42c1'),(7,'Reactor','mdi-chart-bubble','#fd7e14'),(8,'Chiller','mdi-snowflake','#007bff'),(9,'Feeder','mdi-fish','#28a745'),(10,'Dose Pump','mdi-needle','#DC143C'),(11,'Fans','mdi-fan','#00FF00'),(13,'Backup Heater','mdi-thermometer-lines','#dc3545'),(14,'Light','mdi-led-on','#FFD700'),(15,'AquaPi','mdi-raspberrypi','#C71585');
+INSERT INTO `outlet_types` VALUES (1,'Heater','mdi-oil-temperature','#f82b54'),(2,'ATO','mdi-water-percent','#727cf5'),(3,'Powerhead','mdi-waves','#2991ae'),(4,'Pump','mdi-loop','#00ffdd'),(5,'Skimmer','mdi-chart-bubble','#6610f2'),(6,'UV Light','mdi-lightbulb','#7f1ae5'),(7,'Reactor','mdi-chart-bubble','#fd7e14'),(8,'Chiller','mdi-snowflake','#007bff'),(9,'Feeder','mdi-fish','#28a745'),(10,'Dose Pump','mdi-needle','#DC143C'),(11,'Fans','mdi-fan','#00FF00'),(13,'Backup Heater','mdi-thermometer-lines','#dc3545'),(14,'Light','mdi-led-on','#FFD700'),(15,'AquaPi','mdi-raspberrypi','#C71585');
 /*!40000 ALTER TABLE `outlet_types` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -84,6 +85,7 @@ CREATE TABLE `parameter_types` (
   `step` float NOT NULL,
   `dontGraph` tinyint(1) NOT NULL DEFAULT '0',
   `bgColor` varchar(255) NOT NULL DEFAULT '#727cf5',
+  `max` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `eventName` (`eventName`),
   KEY `decimals` (`decimals`),
@@ -98,7 +100,7 @@ CREATE TABLE `parameter_types` (
 
 LOCK TABLES `parameter_types` WRITE;
 /*!40000 ALTER TABLE `parameter_types` DISABLE KEYS */;
-INSERT INTO `parameter_types` VALUES (1,'Nitrite','#000','',2,0.05,0,''),(2,'Nitrate','#000','',0,1,0,''),(3,'Iron','#000','',2,0.1,0,''),(4,'Iodine','#000','',2,0.1,0,''),(5,'ORP','#000','',2,0.1,0,''),(6,'Silicate','#000','',2,0.1,0,''),(7,'Boron','#000','',2,0.1,0,''),(8,'Copper','#000','',2,0.1,0,''),(9,'Calcium','#000','',2,0.1,0,''),(10,'Phosphate','#000','',2,0.1,0,''),(11,'Potassium','#000','',2,0.1,0,''),(12,'Ammonia','#ffbc00','',2,0.05,0,'#ffbc00'),(13,'Chlorine','#000','',2,0.1,0,''),(14,'Phosphorus','#000','',2,0.1,0,''),(15,'TDS','#39afd1','',2,0.1,0,'#39afd1'),(16,'Magnesium','#000','',2,0.1,0,''),(17,'Stronium','#000','',2,0.1,0,''),(18,'GH','#000','',2,0.1,0,''),(19,'Salinity','#fa5c7c','',3,0.001,0,'#fa5c7c'),(20,'PH','#0acf97','',3,0.1,0,'#0acf97'),(21,'Alkalinity','#000','',2,0.1,0,''),(22,'Chloramine','#000','',2,0.1,0,''),(23,'Temperature','#727cf5','#4250f2',2,0.01,0,'#727cf5'),(24,'ATOFloat','#000','#ffbc00',0,0,1,''),(25,'Room_Temperature','#000','',2,0.01,0,''),(26,'Feeding Button','#000','',0,0,1,''),(27,'Outdoor_Temperature','#000','',2,0.01,0,''),(28,'Clean Button','#000','',0,0,1,'');
+INSERT INTO `parameter_types` VALUES (1,'Nitrite','#ffbc00','',2,0.05,0,'',0),(2,'Nitrate','#fa5c7c','',0,1,0,'',0),(3,'Iron','#000','',2,0.1,0,'',0),(4,'Iodine','#000','',2,0.1,0,'',0),(5,'ORP','#000','',2,0.1,0,'',0),(6,'Silicate','#000','',2,0.1,0,'',0),(7,'Boron','#cddc39','',2,0.1,0,'',0),(8,'Copper','#ff9800','',2,0.1,0,'',0),(9,'Calcium','#0acf97','',0,1,0,'',800),(10,'Phosphate','#727cf5','',2,0.1,0,'',0),(11,'Potassium','#000','',2,0.1,0,'',0),(12,'Ammonia','#6c757d','',2,0.05,0,'#ffbc00',0),(13,'Chlorine','#ffc107','',2,0.1,0,'',0),(14,'Phosphorus','#39afd1','',2,0.1,0,'',0),(15,'TDS','#39afd1','',2,0.1,0,'#39afd1',0),(16,'Magnesium','#000','',2,0.1,0,'',0),(17,'Stronium','#000','',2,0.1,0,'',0),(18,'GH','#000','',2,0.1,0,'',0),(19,'Salinity','#ffbc00','',3,0.001,0,'#fa5c7c',0),(20,'PH','#fa5c7c','',3,0.1,0,'#0acf97',0),(21,'Alkalinity','#0acf97','',2,0.1,0,'',0),(22,'Chloramine','#ffeb3b','',2,0.1,0,'',0),(23,'Temperature','#727cf5','#4250f2',2,0.01,0,'#727cf5',0),(24,'ATOFloat','#8bc34a','#ffbc00',0,0,1,'',0),(25,'Room_Temperature','#000','',2,0.01,0,'',0),(26,'Feeding Button','#ff95722','',0,0,1,'',0),(27,'Outdoor_Temperature','#000','',2,0.01,0,'',0),(28,'Clean Button','#000','',0,0,1,'',0);
 /*!40000 ALTER TABLE `parameter_types` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,12 +130,6 @@ CREATE TABLE `settings` (
   `pump_override` varchar(255) NOT NULL,
   `tempScale` varchar(1) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `ecobeeAPI` varchar(255) NOT NULL,
-  `ecobeePIN` varchar(255) NOT NULL,
-  `ecobeeAccess` varchar(255) NOT NULL,
-  `ecobeeRefresh` varchar(255) NOT NULL,
-  `ecobeeTokenType` varchar(255) NOT NULL,
-  `ecobeeAuthCode` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -144,7 +140,7 @@ CREATE TABLE `settings` (
 
 LOCK TABLES `settings` WRITE;
 /*!40000 ALTER TABLE `settings` DISABLE KEYS */;
-INSERT INTO `settings` VALUES (1,'7384b383463417bb4e97c1502629d953',1,'America/New_York','1-hour:Last Hour,3-hour:Last 3 Hours,6-hour:Last 6 Hours,12-hour:Last 12 Hours,1-day:Last Day,2-day:Last 2 Days,1-week:1 Week,1-month:1 Month,3-month:3 Months','3-hour','',1,1,600,600,'2019-05-27 18:38:01','hawtdogflvrwtr@gmail.com','aquapi-session','resume','','f','1.0.0Beta','sM7VUeOGo4YBZ3Oy9Po1MdirMj6PzzeO','u3dx','9WNFBD8wL3forSeSkoEwezA1zwBw3A5J','NEjXXJQkNknGVHNob5Mmn9tpHKI2A9Dz','Bearer','QgPTnuOosIWmYiwJxoJNK4uYkcNqjoIZ');
+INSERT INTO `settings` VALUES (1,'49536546735152925daf2c92917d6bae',1,'America/New_York','1-hour:Last Hour,3-hour:Last 3 Hours,6-hour:Last 6 Hours,12-hour:Last 12 Hours,1-day:Last Day,2-day:Last 2 Days,1-week:1 Week,1-month:1 Month,3-month:3 Months','3-hour','',1,1,300,600,'2020-01-28 03:09:20','hawtdogflvrwtr@gmail.com','aquapi-session','resume','','f','1.0.0Beta');
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -172,7 +168,7 @@ CREATE TABLE `tankkeeping_types` (
 
 LOCK TABLES `tankkeeping_types` WRITE;
 /*!40000 ALTER TABLE `tankkeeping_types` DISABLE KEYS */;
-INSERT INTO `tankkeeping_types` VALUES (1,'Top_Off','mdi-cup-water','primary','#727cf5'),(2,'Water_Change','mdi-water-pump','secondary','#6c757d'),(3,'Dosing','mdi-test-tube','success','#0acf97'),(4,'Filter_Replacement','mdi-broom','danger','#fa5c7c'),(5,'Bulb_Change','mdi-lightbulb-on-outline','warning','#ffbc00'),(6,'Feeding','mdi-fish','info','#39afd1'),(7,'Feeding (No timer)','mdi-fish','info','#39afd1'),(8,'Tank_Cleaning','mdi-broom','danger','#fa5c7c'),(9,'Inhabitant_Addition','mdi-fish','warning','#ffbc00'),(10,'Inhabitant_Removal','mdi-fish','danger','#fa5c7c'),(11,'Equipment_Addition','mdi-power-plug','success','#0acf97'),(12,'Equipment_Removal','mdi-power-plug-off','danger','#fa5c7c'),(14,'Checked_Parameters','mdi-beaker','success','#0acf97');
+INSERT INTO `tankkeeping_types` VALUES (1,'Top_Off','mdi-cup-water','primary','#727cf5'),(2,'Water_Change','mdi-water-pump','success','#0acf97'),(3,'Dosing','mdi-test-tube','secondary','#6c757d'),(4,'Filter_Replacement','mdi-broom','danger','#fa5c7c'),(5,'Bulb_Change','mdi-lightbulb-on-outline','warning','#ffbc00'),(6,'Feeding','mdi-fish','info','#39afd1'),(7,'Feeding (No timer)','mdi-fish','info','#39afd1'),(8,'Tank_Cleaning','mdi-broom','danger','#fa5c7c'),(9,'Inhabitant_Addition','mdi-fish','warning','#ffbc00'),(10,'Inhabitant_Removal','mdi-fish','danger','#fa5c7c'),(11,'Equipment_Addition','mdi-power-plug','success','#0acf97'),(12,'Equipment_Removal','mdi-power-plug-off','danger','#fa5c7c'),(14,'Checked_Parameters','mdi-beaker','success','#0acf97');
 /*!40000 ALTER TABLE `tankkeeping_types` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -185,7 +181,7 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-31 12:27:23
+-- Dump completed on 2020-01-30  1:04:03
 -- MySQL dump 10.16  Distrib 10.1.38-MariaDB, for debian-linux-gnueabihf (armv7l)
 --
 -- Host: localhost    Database: aquapi
@@ -219,7 +215,8 @@ CREATE TABLE `module_entries` (
   `moduleNote` varchar(255) NOT NULL,
   `moduleColor` varchar(255) NOT NULL DEFAULT 'dark',
   `epoch` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`moduleType`,`moduleSerial`,`moduleAddress`,`moduleFirmware`,`moduleNote`,`moduleColor`,`epoch`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -232,7 +229,7 @@ CREATE TABLE `module_entries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-31 12:27:23
+-- Dump completed on 2020-01-30  1:04:03
 -- MySQL dump 10.16  Distrib 10.1.38-MariaDB, for debian-linux-gnueabihf (armv7l)
 --
 -- Host: localhost    Database: aquapi
@@ -272,7 +269,8 @@ CREATE TABLE `outlet_entries` (
   `outletTriggerTest` varchar(2) NOT NULL DEFAULT '=',
   `outletTriggerCommand` varchar(3) NOT NULL,
   `outletIcon` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`moduleId`,`portNumber`,`outletType`,`outletStatus`,`alwaysOn`,`offAtFeeding`,`offAtCleaning`,`outletNote`,`outletTriggerValue`,`outletTriggerParam`,`outletTriggerTest`,`outletTriggerCommand`,`outletIcon`)
 ) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -285,7 +283,7 @@ CREATE TABLE `outlet_entries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-31 12:27:23
+-- Dump completed on 2020-01-30  1:04:03
 -- MySQL dump 10.16  Distrib 10.1.38-MariaDB, for debian-linux-gnueabihf (armv7l)
 --
 -- Host: localhost    Database: aquapi
@@ -323,8 +321,16 @@ CREATE TABLE `parameter_entries` (
   KEY `timestamp` (`timestamp`),
   KEY `type_id_2` (`type_id`),
   KEY `timestamp_2` (`timestamp`),
-  KEY `value_3` (`value`)
-) ENGINE=InnoDB AUTO_INCREMENT=18410 DEFAULT CHARSET=latin1;
+  KEY `value_3` (`value`),
+  KEY `timestamp_3` (`timestamp`),
+  KEY `value_4` (`value`),
+  KEY `type_id_3` (`type_id`),
+  KEY `id_2` (`id`),
+  KEY `id_3` (`id`),
+  KEY `type_id_4` (`type_id`),
+  KEY `timestamp_4` (`timestamp`),
+  KEY `value_5` (`value`)
+) ENGINE=InnoDB AUTO_INCREMENT=414388 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -336,7 +342,7 @@ CREATE TABLE `parameter_entries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-31 12:27:23
+-- Dump completed on 2020-01-30  1:04:03
 -- MySQL dump 10.16  Distrib 10.1.38-MariaDB, for debian-linux-gnueabihf (armv7l)
 --
 -- Host: localhost    Database: aquapi
@@ -368,8 +374,9 @@ CREATE TABLE `tankkeeping_entries` (
   `note` varchar(9999) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `type_id` (`type_id`),
-  KEY `timestamp` (`timestamp`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  KEY `timestamp` (`timestamp`),
+  KEY `id` (`id`,`type_id`,`timestamp`,`note`(767))
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -381,7 +388,7 @@ CREATE TABLE `tankkeeping_entries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-31 12:27:24
+-- Dump completed on 2020-01-30  1:04:03
 -- MySQL dump 10.16  Distrib 10.1.38-MariaDB, for debian-linux-gnueabihf (armv7l)
 --
 -- Host: localhost    Database: aquapi
@@ -421,8 +428,9 @@ CREATE TABLE `outlet_trigger_entries` (
   KEY `outletId` (`outletId`),
   KEY `paramId_2` (`paramId`),
   KEY `value_2` (`value`),
-  KEY `timestamp_2` (`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `timestamp_2` (`timestamp`),
+  KEY `id` (`id`,`moduleId`,`outletId`,`paramId`,`value`,`timestamp`)
+) ENGINE=InnoDB AUTO_INCREMENT=201150 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -434,4 +442,4 @@ CREATE TABLE `outlet_trigger_entries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-31 12:27:24
+-- Dump completed on 2020-01-30  1:04:03

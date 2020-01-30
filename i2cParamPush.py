@@ -113,7 +113,7 @@ def main():
                     print sendVal
                 except:
                     print "Error pushing value"
-        time.sleep(10)
+        time.sleep(5)
 
 
 

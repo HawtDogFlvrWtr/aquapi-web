@@ -6,7 +6,7 @@ if(!defined('INCLUDE_CHECK')) die('You are not allowed to execute this file dire
 
 $db_host		= 'localhost';
 $db_user		= 'aquapi';
-$db_pass		= 'aquapi';
+$db_pass		= 'eUIw77DpznwJxNYE';
 $db_database		= 'aquapi'; 
 
 /* End config */

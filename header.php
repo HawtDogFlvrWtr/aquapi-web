@@ -100,8 +100,10 @@ include 'functions.php';
                     <!-- Topbar Start -->
                     <div class="navbar-custom">
 			<ul style="max-height:70px;" class="list-unstyled topbar-right-menu float-right mb-0">
+<!--
 			 <li id="device-list" class="dropdown notification-list">
 			 </li>
+-->
 			 <li class="dropdown notification-list">
 			   <a class="text-secondary nav-link dropdown-toggle arrow-none" href="#">
 			   <i title="Current Temp" id="Temperature" class="noti-icon">...</i>

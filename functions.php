@@ -114,7 +114,7 @@ $parameterListModule = $conn->query("SELECT id, eventName from parameter_types O
 
 # Only run on dashboard.php 
  if (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false || strpos($_SERVER['PHP_SELF'], 'guest') !== false) {
-	$singleMetric = $conn->query("SELECT parameter_entries.type_id, parameter_types.lineColor, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
+	$singleMetric = $conn->query("SELECT parameter_entries.type_id, parameter_types.max, parameter_types.lineColor, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
 	$graphs = $conn->query("SELECT parameter_entries.type_id, parameter_types.lineColor, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
 	$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
 	$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
@@ -188,6 +188,11 @@ if (isset($_POST['single-metric-value']) && isset($_POST['single-metric-date']) 
     $value = $conn->real_escape_string($_POST['single-metric-value']);
     $type = $conn->real_escape_string($selectedOption);
     $date = correctTZInsert($conn->real_escape_string($_POST['single-metric-date'].":00"), $site_settings['tz']);
+    # Convert PhosP to Phos
+    if ($type == 14) {
+	    $newValue = $value * 3.066 / 1000;
+    	    $insertData = $conn->query("INSERT INTO `parameter_entries` (`id`, `type_id`, `timestamp`, `value`) VALUES (NULL, 10, '".$date."', '".$newValue."')");
+    }
     $insertData = $conn->query("INSERT INTO `parameter_entries` (`id`, `type_id`, `timestamp`, `value`) VALUES (NULL, '".intval($type)."', '".$date."', '".$value."')");
   }
   msgBox("Entry has been added", "success");

@@ -27,16 +27,17 @@ if (isset($_GET['check'])) {
   echo json_encode($rows);
 } elseif(isset($_GET['devices'])) {
 	$outletArray = [];
-	$outletTypes = $conn->query("SELECT id, outletType, typeIcon FROM outlet_types");
+	$outletTypes = $conn->query("SELECT id, outletType, typeIcon, typeColor FROM outlet_types");
 	while ($r = $outletTypes->fetch_assoc()) {
 		$id = $r['id'];
 		$type = $r['outletType'];
 		$icon = $r['typeIcon'];
+		$iconColor = $r['typeColor'];
 		$queryOutlets = $conn->query("SELECT count(id) as count FROM outlet_entries WHERE outletType = $id AND outletStatus = 1");
 		$count = $queryOutlets->fetch_assoc();
 		$count = $count['count'];
 		if ($count > 0) {
-			$outletArray[] = "<i title='$type Status' id='$type' class='ml-1 text-success mdi $icon noti-icon'></i>";
+			$outletArray[] = "<i title='$type On' id='$type' style='color: $iconColor' class='ml-1 mdi mdi-24px $icon noti-icon'></i>";
 		}
 	}
 	echo implode(" ", $outletArray);

@@ -141,8 +141,9 @@ while(true) {
 		$outletTriggerValue = $row['outletTriggerValue'];
 		$moduleInfo = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
 		$moduleInfoReturn = $moduleInfo->fetch_assoc();
-		$returnValueQuery = $conn->query("SELECT parameter_entries.value FROM parameter_entries WHERE type_id=$outletTriggerParam ORDER BY id DESC LIMIT 1");
+		$returnValueQuery = $conn->query("SELECT AVG(parameter_entries.value) AS value FROM parameter_entries WHERE type_id=$outletTriggerParam AND timestamp > NOW() - INTERVAL 60 SECOND ORDER BY id DESC");
 		$returnValue = $returnValueQuery->fetch_array();
+		echo "Param: $outletTriggerParam Avgerage val: ".$returnValue['value']."\n";
 		if ($outletTriggerTest == ">") {
 			if ($returnValue['value'] > $outletTriggerValue) {
 				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n";

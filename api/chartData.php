@@ -51,7 +51,7 @@ if (isset($_GET['check'])) {
 		$real_date = correctTZ($value['timestamp'], $site_settings['tz']);
 		$endValue = correctTZ($triggerVal2['timestamp'], $site_settings['tz']);
 		if ($real_date != $endValue) {
-			$trans = "0.4";
+			$trans = "0.2";
 		} else {
 			$trans = "4";
 		}
@@ -87,7 +87,7 @@ if (isset($_GET['check'])) {
   $findMaintenance = $conn->query("SELECT timestamp from tankkeeping_entries where type_id = 3 and timestamp >= '$firstEntry' AND timestamp <= '$lastEntry'");
   while ($value = $findMaintenance->fetch_array()) {
 	$real_date = correctTZ($value['timestamp'], $site_settings['tz']);
-	$trans = "1";
+	$trans = "0.2";
 	$doseColor = '#1b1b1b';
 	list($r, $g, $b) = sscanf($doseColor, "#%02x%02x%02x");
 	$workedValue = $doseColor.":Dosing:mdi-test-tube";
@@ -105,8 +105,8 @@ if (isset($_GET['check'])) {
 		"backgroundColor" => "rgba($r, $g, $b, $trans)",
 		"value" => $real_date,
 		"endValue" => $real_date,
-		"borderColor" => "rgba($r, $g, $b,$trans)", 
-		"borderWidth" => 2,
+		"borderColor" => "rgba($r, $g, $b, $trans)", 
+		"borderWidth" => 4,
 	);
 	
   }
