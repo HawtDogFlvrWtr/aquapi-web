@@ -11,10 +11,10 @@ if (isset($_GET['limit'])) {
 	if (strpos($limit, '-') !== false) {
 		$limit = strtoupper(str_replace('-', ' ', $limit));
 	} else {
-		$limit = "3 MONTH";
+		$limit = "3 HOUR";
 	}
 } else {
-	$limit = "3 MONTH";
+	$limit = "3 HOUR";
 }
 $newDiv = explode("-", $limit);
 $newHour = $newDiv[0];
@@ -22,12 +22,12 @@ $newLimit = $newDiv[1];
 if (stripos($limit, 'WEEK')) {
 	$div = 'hour';
 } elseif (stripos($limit, 'MONTH')) {
-	$div = 'day';
+	$div = 'hour';
 } elseif (stripos($limit, 'YEAR')){
-	$div = 'week';
+	$div = 'hour';
 } elseif (stripos($limit, 'DAY')){
 	if ($newHour == 1) { 
-		$div = 'minute';
+		$div = 'hour';
 	} else {
 		$div = 'hour';
 	}
