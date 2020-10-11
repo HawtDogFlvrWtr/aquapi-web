@@ -54,7 +54,7 @@ if (!$wcRecord['timestamp']) {
 						$maxVal = '';
 					}	
 				?>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <div class="card widget-flat text-center">
                                             <div class="card-body">
 						<div class="dropdown float-right">
@@ -63,7 +63,7 @@ if (!$wcRecord['timestamp']) {
                 	                            </a>
 						</div>
                                                 <h5 id="single-metric-title" class="text-muted font-weight-normal mt-3" title="Current tank temperature"><?php echo str_replace("_", " ", $row['eventName']) ?></h5>
-						<p style="color:<?php echo $row['lineColor'];?>" id="<?php echo $row['eventName'] ?>-single-metric" class="text-nowrap display-4 mt-1 mb-1"></p>
+						<h1 style="color:<?php echo $row['lineColor'];?>" id="<?php echo $row['eventName'] ?>-single-metric" class="text-nowrap mt-1 mb-1"></h1>
                                                 <h5 class="mb-0 text-muted">
                                                     <span id="<?php echo $row['eventName'] ?>-single-metric-date" class="text-nowrap">Loading..</span>
                                                 </h5>
@@ -100,7 +100,7 @@ if (!$wcRecord['timestamp']) {
 				<?php
 				}
 				?>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <div class="widget-flat text-center">
                                             <div class="card-body">
                                                 <a id="add-single-metric" href="" class="display-1 mdi mdi-plus mt-1 mb-3" data-toggle="modal" data-target="#add-metric" aria-expanded="false"></a>
