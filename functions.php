@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set($tz);
+date_default_timezone_set($site_settings['tz']);
 # Username Info
 session_start();
 if (isset($_GET['debug'])) {
@@ -80,7 +80,7 @@ function correctAttTZ($dateString, $tz) {
   $real_date->setTimeZone(new DateTimeZone($tz));
   return $real_date->format('Y-m-d H:i');
 }
-$calendarDate = correctAttTZ(date(), $site_settings['tz']);
+$calendarDate = correctAttTZ(date('Y-m-d h:m'), $site_settings['tz']);
 $graphLimit = explode(",", $site_settings['graphLimit']);
 
 # Store alets
@@ -91,7 +91,6 @@ function msgBoxDisplay() {
 function msgBox($message = "", $type = "") {
   $_SESSION[$sessionId]['msgBox'] = "<div class='mt-2 alert alert-$type' role='alert'><strong>$message</strong></div>";
 }
-
 $getParameterList = $_SERVER['QUERY_STRING'];
 
 if (isset($_SESSION[$sessionId]['email']) && isset($_POST['limit'])) {
