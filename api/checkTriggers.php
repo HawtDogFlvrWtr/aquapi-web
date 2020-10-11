@@ -19,8 +19,9 @@ function updateDB($conn, $moduleId, $outletId, $paramId, $value) {
 }
 
 function changePort($ip, $portNum, $value) {
+	$realPortNum = $portNum;
 	$portNum = $portNum - 1;
-	echo "Telling $ip/$portNum to turn $value \n";
+	echo "Telling $ip/$realPortNum to turn $value \n";
 	$url = 'http://admin:seven8910@'.$ip.'/restapi/relay/outlets/'.$portNum.'/state/';
 	if ($value == 'ON') {
 		$value = 'true';
@@ -60,20 +61,33 @@ while(true) {
           FROM
                 settings
 	";
+	$currentTime = date('H:i');
 	$result = $conn->query($setSql);
 	$site_settings = $result->fetch_assoc() or die('-99'.mysqli_error());
 	if ($feedTimer != $site_settings['feedTime']) {
 		echo "Feed timer change from $feedTimer to ".$site_settings['feedTime']."\n";
 	}
 	$feedTimer = $site_settings['feedTime'];
-	# Handle feed and always on
-	$outletEntriesAO = $conn->query("SELECT * FROM outlet_entries WHERE alwaysOn = 1");
+	# Handle feed and always on and timer
+	$outletEntriesAO = $conn->query("SELECT * FROM outlet_entries WHERE alwaysOn = 1 OR on_time is not null");
 	while ($row = $outletEntriesAO->fetch_assoc()) {
+		$onTime = $row['on_time'];
+		$offTime = $row['off_time'];
 		$returnValueQuery = $conn->query("SELECT * FROM parameter_entries WHERE type_id=26 ORDER BY id DESC LIMIT 1"); // Check for feeding.
 		$returnValue = $returnValueQuery->fetch_array();
 		$outletTriggerParam = $row['outletTriggerParam'];
 		$moduleInfoAO = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
 		$moduleInfoReturnAO = $moduleInfoAO->fetch_assoc();
+		# On timer
+		if (!is_null($onTime) && $currentTime >= $onTime && $currentTime < $offTime && $row['outletStatus'] == 0) {
+			echo "On time triggered. Turning outlet on\n";
+			changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
+		}
+		#Off timer
+		if (!is_null($offTime) && ($currentTime >= $offTime || $currentTime < $onTime) && $row['outletStatus'] == 1) {
+			echo "Off time triggered. Turning outlet off\n";
+			changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'OFF');
+		}
 		if ($row['offAtFeeding'] == 1) {
 			if ($returnValue['value'] == 0) { // turn it back on if feeding is over but the outlet is off.
 				if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
@@ -106,7 +120,7 @@ while(true) {
 	}
 
 	# Handle unused outlets
-	$outletUnusedEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerTest = '' AND outletTriggerCommand = '' AND outletTriggerParam = 0 AND alwaysOn = 0");
+	$outletUnusedEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerTest = '' AND outletTriggerCommand = '' AND outletTriggerParam = 0 AND alwaysOn = 0 AND on_time is null AND off_time is null");
 	while ($row = $outletUnusedEntries->fetch_assoc()) {
 		if ($row['outletStatus'] == 1) {
 			$outletTriggerParam = $row['outletTriggerParam'];

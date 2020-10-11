@@ -3,7 +3,8 @@
 if(!defined('INCLUDE_CHECK')) die('You are not allowed to execute this file directly');
 
 /* Database config */
-
+$redis = new Redis();
+$redis->connect('localhost', 6379);
 $db_host		= 'localhost';
 $db_user		= 'aquapi';
 $db_pass		= 'eUIw77DpznwJxNYE';
@@ -42,7 +43,7 @@ $setSql = "
 ";
 $result = $conn->query($setSql);
 $site_settings = $result->fetch_assoc() or die('-99'.mysqli_error());
-date_default_timezone_set($tz);
+date_default_timezone_set($site_settings['tz']);
 $sessionId = $site_settings['sessionId'];
 $currentPage = end(explode("/", $_SERVER['REQUEST_URI']));
 ?>

@@ -148,7 +148,7 @@ if (!$wcRecord['timestamp']) {
  			    <?php
 			      while($row = $graphs->fetch_assoc()) {
 			    ?>
-                            <div class="col-xl-6">
+			    <div id="col-<?php echo $row['eventName'];?>" class="col-xl-6">
                                 <div class="card">
 				    <div class="card-body">
 					<h4 color="<?php echo $row['lineColor'];?>" id="chart-title" class="header-title"><?php echo $row['eventName'];?> Chart</h4>
@@ -239,7 +239,7 @@ if (!$wcRecord['timestamp']) {
 						while($row = $maintenanceList->fetch_assoc()) {
 						?>
                                                 <div class="timeline-item">
-                                                    <i title="Add Maintenance Item" class="mdi <?php echo $row['icon']; ?> bg-<?php echo $row['text-color']; ?>-lighten text-<?php echo $row['text-color']; ?> timeline-icon"></i>
+                                                    <i title="Add Maintenance Item" class="mdi <?php echo $row['icon']; ?> bg-<?php echo $row['word_color']; ?>-lighten text-<?php echo $row['word_color']; ?> timeline-icon"></i>
                                                     <div class="timeline-item-info">
                                                         <h5 class="text-<?php echo $row['text-color']; ?> font-weight-bold mb-1 d-block"><?php echo str_replace("_", " ", $row['type']);?></h5>
                                                         <small><?php echo $row['note'];?></small>

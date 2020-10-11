@@ -103,6 +103,9 @@ def main():
 	print(">>   List_addr lists the available I2C addresses.")
 	print(">>   Address,xx changes the I2C address the Raspberry Pi communicates with.")
 	print(">>   Poll,xx.x command continuously polls the board every xx.x seconds")
+	print(">>   Cal,mid,7 calibrates for solution mid")
+	print(">>   Cal,low,4 calibrates for solution low")
+	print(">>   Cal,high,10 calibrates for solution high")
 	print(" where xx.x is longer than the %0.2f second timeout." % AtlasI2C.long_timeout)
 	print(">> Pressing ctrl-c will stop the polling")
 	

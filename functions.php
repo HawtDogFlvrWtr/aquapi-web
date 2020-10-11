@@ -117,7 +117,7 @@ $parameterListModule = $conn->query("SELECT id, eventName from parameter_types O
 	$singleMetric = $conn->query("SELECT parameter_entries.type_id, parameter_types.max, parameter_types.lineColor, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
 	$graphs = $conn->query("SELECT parameter_entries.type_id, parameter_types.lineColor, parameter_types.eventName FROM parameter_entries LEFT JOIN parameter_types ON parameter_entries.type_id = parameter_types.id WHERE parameter_types.dontGraph = 0 AND parameter_entries.id IN (SELECT MIN(parameter_entries.id) FROM parameter_entries GROUP BY parameter_entries.type_id DESC) ORDER BY parameter_entries.type_id DESC");
 	$maintenanceItems = $conn->query("SELECT * FROM tankkeeping_types");
-	$maintenanceList = $conn->query("SELECT `type_id`, `timestamp`, `note`, `type`, `icon`, `text-color`  FROM `tankkeeping_entries`, `tankkeeping_types`  WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
+	$maintenanceList = $conn->query("SELECT tankkeeping_entries.id, type_id, timestamp, note, type, icon, word_color FROM tankkeeping_entries, tankkeeping_types WHERE tankkeeping_entries.type_id = tankkeeping_types.id GROUP BY tankkeeping_entries.timestamp DESC");
  }
 
 # Only run on modules.php 
@@ -134,8 +134,10 @@ if (strpos($_SERVER['PHP_SELF'], 'modules') !== false) {
 		$outletType = $conn->real_escape_string($_POST['outletType']);
 		$outletNote = $conn->real_escape_string($_POST['outletNote']);
 		$outletId = $conn->real_escape_string($_POST['outletId']);
+		$onTime = $conn->real_escape_string($_POST['on-time']);
+		$offTime = $conn->real_escape_string($_POST['off-time']);
 		$outletIdSplit = explode("-",$outletId);
-		$pushUpdate = $conn->query("UPDATE outlet_entries SET outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', offAtCleaning = '".$cleanCommand."', offAtFeeding = '".$feedCommand."', alwaysOn = '".$AOCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
+		$pushUpdate = $conn->query("UPDATE outlet_entries SET on_time = '".$onTime."', off_time = '".$offTime."',  outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', offAtCleaning = '".$cleanCommand."', offAtFeeding = '".$feedCommand."', alwaysOn = '".$AOCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
 		msgBox("Outlet configuration was saved successfully.", "success");
 		header("Location: modules.php");
 		exit();

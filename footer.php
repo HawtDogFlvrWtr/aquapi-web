@@ -127,165 +127,165 @@
 	{ url: 'api/calendar.php',} 
 ] });
 </script>
-	<script>
-	$(document).ready(function(){
-		function hexToRgbA(hex){
-		    var c;
-		    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-			c= hex.substring(1).split('');
-			if(c.length== 3){
-			    c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+<script>
+$(document).ready(function(){
+	function hexToRgbA(hex){
+	    var c;
+	    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+		c= hex.substring(1).split('');
+		if(c.length== 3){
+		    c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+		}
+		c= '0x'+c.join('');
+		return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',0.5)';
+	    }
+	    throw new Error('Bad Hex');
+	}
+	function getHiddenProp() {
+		var prefixes = ['webkit', 'moz', 'ms', 'o'];
+		// if 'hidden' is natively supported just return it
+		if ('hidden' in document) return 'hidden';
+
+		// otherwise loop over all the known prefixes until we find one
+		for (var i = 0; i < prefixes.length; i++) {
+			if ((prefixes[i] + 'Hidden') in document)
+				return prefixes[i] + 'Hidden';
+		}
+		// otherwise it's not supported
+		return null;
+	}
+	function isHidden() {
+		var prop = getHiddenProp();
+		if (!prop) return false;
+		return document[prop];
+	}
+
+	function captureCharts() {
+		    var running = 0;
+		    $('.card-body #chart-title').each(function(index) {
+			    running = 1;
+			    var metricName = $(this).html();
+			    var metricColor = $(this).attr("color");
+			    var splitName = metricName.split(' ');
+			    var realName = splitName[0];
+			    var chartCall = $.get(`api/chartData_live.php?check=${realName}&limit=<?php echo $_SESSION[$sessionId]['limit'];?>`, function (data) {
+				var jsonData = JSON.parse(data);
+				if (jsonData.jsonarray) {
+					var count = Object.keys(jsonData.jsonarray).length;
+				} else {
+					var count = 0;
+				}
+				if (count <= 3) {
+				  $(document.getElementById("col-"+realName)).hide();
+				  $(document.getElementById("chart-"+realName)).html("<h6>There isn't enough chart information for the timerange you've selected. You can view the last recorded value above.</h6>");
+				} else {
+				  $(document.getElementById("col-"+realName)).show();
+				  var labels = jsonData.jsonarray.map(function(e) {
+				    return e.label;
+				  });
+				  var values = jsonData.jsonarray.map(function(e) {
+				    return e.value;
+				  });
+				  var minChart = Math.min.apply(Math, values);
+				  var maxChart = Math.max.apply(Math, values);
+				  if (jsonData.annoList) {
+				     if (Object.keys(jsonData.annoList).length >= 1) {
+					  var annoList = jsonData.annoList;
+				     }
+				  } else {
+					  var annoList = [];
+				  }
+				  if (jsonData.annotations) {
+				     if (Object.keys(jsonData.annotations).length >= 1) {
+					  var anno = jsonData.annotations;
+				     }
+				  } else {
+					  var anno = [];
+				  }
+				  var ctx = document.getElementById("line-chart-"+realName).getContext('2d');
+				  var i;
+				  if (annoList) {	  
+					  $("[id^=annoLegend]").each(function(index) {
+						  $(this).empty();
+						  for (i = 0; i < annoList.length; i++) {
+							var splitVal = annoList[i].split(":");
+							$(this).append(`<i title="${splitVal[1]}" class="noti-icon ml-1 mdi ${splitVal[2]}" style="color: ${splitVal[0]}"></i>`);
+						  }
+
+					  });
+				  }
+				  var config = {
+				       type: 'line',
+				       options: {
+					 scales: {
+					   xAxes: [{
+					     gridLines: {
+					       display:false
+					     },
+					     ticks: {
+					       display: false
+					     },
+					     type: 'time',
+					     //time: {
+					     //  unit: 'hour',
+					     //  round: 'hour'
+					     //}
+					   }],
+					   yAxes: [{
+					     ticks: {
+						min: minChart,
+						max: maxChart,
+						stepSize:20
+					     },
+					     gridLines: {
+					       display: true
+					     },
+					   }]
+					 },
+					 animation: {
+					   duration: 2 
+					 },
+					 tooltips: {
+					   mode: 'index',
+					   intersect: false,
+					  },
+					 annotation: {
+						drawTime: "afterDatasetsDraw",
+						annotations: anno,
+					 },
+				       },
+				       hover: {
+					 mode: 'nearest',
+					 intersect: true
+				       },
+				       data: {
+					  labels: labels,
+					  datasets: [{
+						  fill: true,
+						  label: realName,
+						  data: values,
+						  pointRadius: 0,
+						  pointBackgroundColor: metricColor,
+						  backgroundColor: hexToRgbA(metricColor),
+						  borderColor: metricColor,
+						  borderWidth:2 
+					  }]
+				       },
+				  };
+				  var chart = new Chart(ctx, config);
+				};
+			    });
+			    running = 0;
+		    });
+		  }
+		  setInterval(function(){
+			if(!isHidden()){
+				captureCharts();
 			}
-			c= '0x'+c.join('');
-			return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',0.5)';
-		    }
-		    throw new Error('Bad Hex');
-		}
-		function getHiddenProp() {
-			var prefixes = ['webkit', 'moz', 'ms', 'o'];
-			// if 'hidden' is natively supported just return it
-			if ('hidden' in document) return 'hidden';
-
-			// otherwise loop over all the known prefixes until we find one
-			for (var i = 0; i < prefixes.length; i++) {
-				if ((prefixes[i] + 'Hidden') in document)
-					return prefixes[i] + 'Hidden';
-			}
-			// otherwise it's not supported
-			return null;
-		}
-		function isHidden() {
-			var prop = getHiddenProp();
-			if (!prop) return false;
-			return document[prop];
-		}
-
-			function captureCharts() {
-                                    $('.card-body #chart-title').each(function(index) {
-					    var metricName = $(this).html();
-					    var metricColor = $(this).attr("color");
-                                            var splitName = metricName.split(' ');
-                                            var realName = splitName[0];
-                                            $.get(`api/chartData.php?check=${realName}&limit=<?php echo $_SESSION[$sessionId]['limit'];?>`, function (data) {
-                                                var jsonData = JSON.parse(data);
-						if (jsonData.jsonarray) {
-							var count = Object.keys(jsonData.jsonarray).length;
-						} else {
-							var count = 0;
-						}
-						if (count <= 3) {
-						  $(document.getElementById("chart-"+realName)).html("<h6>There isn't enough chart information for the timerange you've selected. You can view the last recorded value above.</h6>");
-						} else {
-                                                  var labels = jsonData.jsonarray.map(function(e) {
-                                                    return e.label;
-                                                  });
-                                                  var values = jsonData.jsonarray.map(function(e) {
-                                                    return e.value;
-						  });
-						  var minChart = Math.min.apply(Math, values);
-						  var maxChart = Math.max.apply(Math, values);
-						  if (jsonData.annoList) {
-						     if (Object.keys(jsonData.annoList).length >= 1) {
-							  var annoList = jsonData.annoList;
-						     }
-						  } else {
-							  var annoList = [];
-						  }
-						  if (jsonData.annotations) {
-						     if (Object.keys(jsonData.annotations).length >= 1) {
-							  var anno = jsonData.annotations;
-						     }
-						  } else {
-							  var anno = [];
-						  }
-						  var ctx = document.getElementById("line-chart-"+realName).getContext('2d');
-						  var i;
-						  if (annoList) {	  
-							  $("[id^=annoLegend]").each(function(index) {
-							  	  $(this).empty();
-								  for (i = 0; i < annoList.length; i++) {
-									var splitVal = annoList[i].split(":");
-									$(this).append(`<i title="${splitVal[1]}" class="noti-icon ml-1 mdi ${splitVal[2]}" style="color: ${splitVal[0]}"></i>`);
-								  }
-
-							  });
-						  }
-                                                  var config = {
-                                                       type: 'line',
-						       options: {
-							 scales: {
-							   xAxes: [{
-							     gridLines: {
-							       display:false
-							     },
-							     ticks: {
-							       display: false
-	  						     },
-							     type: 'time',
-							     //time: {
-  							     //  unit: 'hour',
-							     //  round: 'hour'
-						  	     //}
-							   }],
-							   yAxes: [{
-							     ticks: {
-								min: minChart,
-								max: maxChart,
-								stepSize:20
-						  	     },
-							     gridLines: {
-							       display: true
-							     },
-							   }]
-							 },
-                                                         animation: {
-                                                           duration: 2 
-                                                         },
-		  				         tooltips: {
-		  				  	   mode: 'index',
-		  					   intersect: false,
-							  },
-							 annotation: {
-								drawTime: "afterDatasetsDraw",
-								annotations: anno,
-							 },
-                                                       },
-		  				       hover: {
-		  				 	 mode: 'nearest',
-		  					 intersect: true
-	  					       },
-                                                       data: {
-                                                          labels: labels,
-                                                          datasets: [{
-                                                                  fill: true,
-                                                                  label: realName,
-                                                                  data: values,
-                                                                  pointRadius: 0,
-                                                                  pointBackgroundColor: metricColor,
-                                                                  backgroundColor: hexToRgbA(metricColor),
-								  borderColor: metricColor,
-                                                                  borderWidth:2 
-                                                          }]
-                                                       },
-                                                  };
-                                                  var chart = new Chart(ctx, config);
-						};
-                                            });
-                                    });
-                                  }
-				  setInterval(function(){
-					if(!isHidden()){
-						captureCharts();
-					}
-				  }, 30000);
-                                  captureCharts();
-	});
-	</script>
-				<script type="text/javascript">
-					$(window).on('load',function(){
-						$('#ecobee').modal('show');
-					});
-				</script>
+		  }, 30000);
+		  captureCharts();
+});
+</script>
 	<script src="assets/js/custom.js"></script>
 	<!-- end custom javascript -->
                                                                                                                                                                                                            

@@ -183,6 +183,21 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
+								    <label class="mt-2" title="Ensure the is off and on based on time">Schedule On/Off Time</label>
+								    <small class="mt-1" >(This will override the always-on function)</small>
+									<div class="row col-12">
+										<div class="col-6 form-group">
+											<label>On</label>
+											<input value="<?php echo $portRow['on_time'];?>" name="on-time" type="text" class="form-control" data-toggle="input-mask" data-mask-format="00:00">
+												<span class="font-13 text-muted">e.g "HH:MM"</span>
+										</div>
+										<div class="col-6 form-group">
+											<label>Off</label>
+											<input value="<?php echo $portRow['off_time'];?>" name="off-time" type="text" class="form-control" data-toggle="input-mask" data-mask-format="00:00">
+												<span class="font-13 text-muted">e.g "HH:MM"</span>
+										</div>
+									</div>
+									
                                 		                </div>
 							    <input type="hidden" name="outletId" id="outletId" value="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>">
 							    <button id="clear_<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>" type="button" class="float-left btn btn-warning mt-2 mb-2">Clear</button>
