@@ -127,19 +127,52 @@ if (strpos($_SERVER['PHP_SELF'], 'modules') !== false) {
 		$triggerTest = $conn->real_escape_string($_POST['triggerTest']);
 		$triggerValue = $conn->real_escape_string($_POST['triggerValue']);
 		$triggerCommand = $conn->real_escape_string($_POST['triggerCommand']);
+		if ($triggerParam == '') {
+			$triggerParam = 'NULL';
+			$triggerTest = '';
+			$triggerValue = 'NULL';
+			$triggerCommand = '';
+		}
 		$cleanCommand = $conn->real_escape_string($_POST['cleanCommand']);
+		if ($cleanCommand == '') {
+			$cleanCommand = 0;
+		}
 		$feedCommand = $conn->real_escape_string($_POST['feedCommand']);
+		if ($feedCommand == '') {
+			$feedCommand = 0;
+		}
 		$AOCommand = $conn->real_escape_string($_POST['AOCommand']);
 		$outletType = $conn->real_escape_string($_POST['outletType']);
+		if ($outletType == '') {
+			$outletType = '0';
+		}
 		$outletNote = $conn->real_escape_string($_POST['outletNote']);
 		$outletId = $conn->real_escape_string($_POST['outletId']);
 		$onTime = $conn->real_escape_string($_POST['on-time']);
 		$offTime = $conn->real_escape_string($_POST['off-time']);
+		if ($AOCommand == '') {
+			$AOCommand = '0';
+		}
+		if ($onTime == '') {
+			$onTime = 'NULL';
+			$offTime = 'NULL';
+		} else {
+			$onTime = '"'.$onTime.'"';
+			$offTime = '"'.$offTime.'"';
+			$AOCommand = '0'; #Disable always on
+		}
 		$outletIdSplit = explode("-",$outletId);
-		$pushUpdate = $conn->query("UPDATE outlet_entries SET on_time = '".$onTime."', off_time = '".$offTime."',  outletTriggerValue = '".$triggerValue."', outletTriggerTest = '".$triggerTest."', outletTriggerCommand = '".$triggerCommand."', offAtCleaning = '".$cleanCommand."', offAtFeeding = '".$feedCommand."', alwaysOn = '".$AOCommand."', outletTriggerParam = '".$triggerParam."', outletNote = '".$outletNote."', outletType= '".$outletType."' WHERE moduleId = '".$outletIdSplit[0]."' AND portNumber = '".$outletIdSplit[1]."'");
-		msgBox("Outlet configuration was saved successfully.", "success");
-		header("Location: modules.php");
-		exit();
+		$connection = "UPDATE outlet_entries SET on_time = $onTime, off_time = $offTime,  outletTriggerValue = $triggerValue, outletTriggerTest = '$triggerTest', outletTriggerCommand = '$triggerCommand', offAtCleaning = $cleanCommand, offAtFeeding = $feedCommand, alwaysOn = '".$AOCommand."', outletTriggerParam = $triggerParam, outletNote = '".$outletNote."', outletType= $outletType WHERE moduleId = $outletIdSplit[0] AND portNumber = $outletIdSplit[1]";
+		if ($conn->query("UPDATE outlet_entries SET on_time = $onTime, off_time = $offTime,  outletTriggerValue = $triggerValue, outletTriggerTest = '$triggerTest', outletTriggerCommand = '$triggerCommand', offAtCleaning = $cleanCommand, offAtFeeding = $feedCommand, alwaysOn = '".$AOCommand."', outletTriggerParam = $triggerParam, outletNote = '".$outletNote."', outletType= $outletType WHERE moduleId = $outletIdSplit[0] AND portNumber = $outletIdSplit[1]")) {
+			msgBox("Outlet configuration was saved successfully. $connection", "success");
+			header("Location: modules.php");
+			exit();
+		} else {
+			msgBox("Failed to save outlet configuration. $connection", "danger");
+			header("Location: modules.php");
+			exit();
+		}
+
 
 
 	}

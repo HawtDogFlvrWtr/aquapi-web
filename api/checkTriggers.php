@@ -40,203 +40,122 @@ function changePort($ip, $portNum, $value) {
 while(true) {
   try {	
 	// Get Settings Data
-	$setSql = "
-          SELECT
-                dashboard_update,
-                tz,
-		graphLimit,
-		defaultGraphLimit,
-		performAction,
-		pumpStatus,
-		lightStatus,
-		username,
-		user_password,
-		sessionId,
-		light_override,
-		pump_override,
-		tempScale,
-		feedTime,
-		cleanTime,
-		version
-          FROM
-                settings
-	";
-	$currentTime = date('H:i');
+	$setSql = "SELECT dashboard_update, tz, graphLimit, defaultGraphLimit, performAction, pumpStatus, lightStatus, username, user_password, sessionId, light_override, pump_override, tempScale, feedTime, cleanTime, version FROM settings";
+	$currentTimeTimer = date('H:i');
 	$result = $conn->query($setSql);
 	$site_settings = $result->fetch_assoc() or die('-99'.mysqli_error());
 	if ($feedTimer != $site_settings['feedTime']) {
 		echo "Feed timer change from $feedTimer to ".$site_settings['feedTime']."\n";
 	}
 	$feedTimer = $site_settings['feedTime'];
-	# Handle feed and always on and timer
-	$outletEntriesAO = $conn->query("SELECT * FROM outlet_entries WHERE alwaysOn = 1 OR on_time is not null");
-	while ($row = $outletEntriesAO->fetch_assoc()) {
+	$outletEntries = $conn->query("SELECT * FROM outlet_entries");
+	while ($row = $outletEntries->fetch_assoc()) {
 		$onTime = $row['on_time'];
 		$offTime = $row['off_time'];
-		$returnValueQuery = $conn->query("SELECT * FROM parameter_entries WHERE type_id=26 ORDER BY id DESC LIMIT 1"); // Check for feeding.
-		$returnValue = $returnValueQuery->fetch_array();
-		$outletTriggerParam = $row['outletTriggerParam'];
-		$moduleInfoAO = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
-		$moduleInfoReturnAO = $moduleInfoAO->fetch_assoc();
-		# On timer
-		if (!is_null($onTime) && $currentTime >= $onTime && $currentTime < $offTime && $row['outletStatus'] == 0) {
-			echo "On time triggered. Turning outlet on\n";
-			changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
-		}
-		#Off timer
-		if (!is_null($offTime) && ($currentTime >= $offTime || $currentTime < $onTime) && $row['outletStatus'] == 1) {
-			echo "Off time triggered. Turning outlet off\n";
-			changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'OFF');
-		}
-		if ($row['offAtFeeding'] == 1) {
-			if ($returnValue['value'] == 0) { // turn it back on if feeding is over but the outlet is off.
-				if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
-					#Turn outlet on that's supposed to be on but isn't. This will help on first boot.
-					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
-					#echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
-					echo("Feeding Ended. Starting outlets\n");
-				}
-			} else {
-				if ($row['outletStatus'] == 1) {
-					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'OFF');
-					echo("Feeding Starting\n");
-				}
-				$currentTime = time();
-				$recordTime = correctTZEpoch($returnValue['timestamp'], $site_settings['tz']);
-				echo "recordTime: ".$recordTime." ".$currentTime."\n";
-				if ($recordTime + $site_settings['feedTime'] < $currentTime) {	// Check if feeding time is over.
-					$conn->query("INSERT INTO parameter_entries (type_id, value) VALUES (".$returnValue['type_id'].", 0)"); // Set that feeding is over.
-					echo("Feeding Ended. Updating the DB\n");
-				}
-			}
-		} else if ($row['offAtFeeding'] == 0) {
-			if ($row['outletStatus'] == 0 && $row['alwaysOn'] == 1 ) {
-				# Turn outlet on that's supposed to be on but isn't. This will help on first boot.
-				changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], 'ON');
-				echo("Turning on ".$moduleInfoReturnAO['moduleAddress']."/".$row['portNumber']."\n");
-			}
-
-		}
-	}
-
-	# Handle unused outlets
-	$outletUnusedEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerTest = '' AND outletTriggerCommand = '' AND outletTriggerParam = 0 AND alwaysOn = 0 AND on_time is null AND off_time is null");
-	while ($row = $outletUnusedEntries->fetch_assoc()) {
-		if ($row['outletStatus'] == 1) {
-			$outletTriggerParam = $row['outletTriggerParam'];
-			$moduleInfo = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
-			$moduleInfoReturn = $moduleInfo->fetch_assoc();
-			$outletTriggerCommand = 'OFF';
-			$outletTriggerParam = 0;
-			changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-			updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
-		}
-	}
-
-	# Handle trigger outlets
-	$outletEntries = $conn->query("SELECT * FROM outlet_entries WHERE outletTriggerTest != '' AND outletTriggerCommand != '' AND outletTriggerParam != 0");
-	while ($row = $outletEntries->fetch_assoc()) {
-		if ($row['outletStatus'] == 0) {
-			$row['outletStatus'] = 'OFF';
+		$offFeeding = $row['offAtFeeding'];
+		$outletStatus = strtoupper($row['outletStatus']); # Ensure uppercase for logic
+		if ($outletStatus == 0) {
+			$outletStatus = 'OFF';
 		} else {
-			$row['outletStatus'] = 'ON';
+			$outletStatus = 'ON';
 		}
 		$outletTriggerTest = $row['outletTriggerTest'];
-		$outletTriggerCommand = strtoupper($row['outletTriggerCommand']);
-		#echo "Outlet trigger command is $outletTriggerCommand\n";
-		if ($outletTriggerCommand == 'ON') {
-			$outletTriggerCommandOpposite = 'OFF';
-			#echo "Opp is Off\n";
-		} else {
-			$outletTriggerCommandOpposite = 'ON';
-			#echo "Opp is On\n";
-		}
+		$outletTriggerCommand = strtoupper($row['outletTriggerCommand']); # Ensure uppercase for logic
 		$outletTriggerParam = $row['outletTriggerParam'];
 		$outletTriggerValue = $row['outletTriggerValue'];
-		$moduleInfo = $conn->query("SELECT * FROM module_entries WHERE id = ".$row['moduleId']);
+		$portNumber = $row['portNumber'];
+		$moduleId = $row['moduleId'];
+		$moduleInfo = $conn->query("SELECT * FROM module_entries WHERE id = $moduleId");
 		$moduleInfoReturn = $moduleInfo->fetch_assoc();
-		$returnValueQuery = $conn->query("SELECT AVG(parameter_entries.value) AS value FROM parameter_entries WHERE type_id=$outletTriggerParam AND timestamp > NOW() - INTERVAL 60 SECOND ORDER BY id DESC");
-		$returnValue = $returnValueQuery->fetch_array();
-		echo "Param: $outletTriggerParam Avgerage val: ".$returnValue['value']."\n";
-		if ($outletTriggerTest == ">") {
-			if ($returnValue['value'] > $outletTriggerValue) {
-				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n";
-				if ($row['outletStatus'] != $outletTriggerCommand) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
-				}
-			} else {
-				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
-				}
-			}
-		} elseif ($outletTriggerTest == "<") {
-			if ($returnValue['value'] < $outletTriggerValue) {
-				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommand) {
-					changePort($moduleInfoReturnAO['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
-				}
-			} else {
-				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
-				}
+		$moduleAddress = $moduleInfoReturn['moduleAddress'];
+		$moduleId = $moduleInfoReturn['id'];
+		$alwaysOn = $row['alwaysOn'];
+		$triggered = 0;
+		$offOutlet = 0;
+		$supOn = FALSE; # Setting loop default
+		$supOff = FALSE; # Setting loop default
+		if ($outletTriggerParam != 0) {
+			# Handle unconfigured ports (Make sure off)
+			if ($row['outletStatus'] == 1 && is_null($outletTriggerTest) && is_null($outletTriggerCommand) && is_null($outletTriggerParam) && is_null($alwaysOn) && is_null($onTime) && is_null($offTime)) {
+				$outletTriggerCommand = 'OFF';
+				$outletTriggerParam = 0;
+				$offOutlet = 1;
+				echo "HERE 6\n";
+				changePort($moduleAddress, $portNumber, $outletTriggerCommand);
+				updateDB($conn, $moduleId, $portNumber, $outletTriggerParam, $outletTriggerCommand);
 			}
 
-		} elseif ($outletTriggerTest == ">=") {
-			if ($returnValue['value'] >= $outletTriggerValue) {
-				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommand) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
-				}
-			} else {
-				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
+			# Handle trigger outlets
+			if (!is_null($outletTriggerTest) && !is_null($outletTriggerCommand) && !is_null($outletTriggerParam)) { # Ensure not disabled port
+				$returnValueQuery = $conn->query("SELECT AVG(parameter_entries.value) AS value FROM parameter_entries WHERE type_id=$outletTriggerParam AND timestamp > NOW() - INTERVAL 60 SECOND ORDER BY id DESC LIMIT 1");
+				$returnValue = $returnValueQuery->fetch_array();
+				$paramValue = $returnValue['value'];
+				if (!is_null($paramValue)) { # Only if value returns.
+					if ($outletTriggerTest == ">") {
+						if ($paramValue > $outletTriggerValue) {
+							$triggered = 1;
+						}
+					} elseif ($outletTriggerTest == "<") {
+						if ($paramValue < $outletTriggerValue) {
+							$triggered = 1;
+						}
+
+					} elseif ($outletTriggerTest == ">=") {
+						if ($paramValue >= $outletTriggerValue) {
+							$triggered = 1;
+						}
+
+					} elseif ($outletTriggerTest == "<=") {
+						if ($paramValue <= $outletTriggerValue) {
+							$triggered = 1;
+						}
+
+					} elseif ($outletTriggerTest == "=") {
+						if ($paramValue == $outletTriggerValue) {
+							$triggered = 1;
+						}
+
+					}
+				} else {
+					echo("Nothing received for $outletTriggerParam type in the last 60 seconds\n");
 				}
 			}
-
-		} elseif ($outletTriggerTest == "<=") {
-			if ($returnValue['value'] <= $outletTriggerValue) {
-				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommand) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
-				}
-			} else {
-				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
-				}
-			}
-
-		} elseif ($outletTriggerTest == "=") {
-			if ($returnValue['value'] == $outletTriggerValue) {
-				#echo $returnValue['value']." is ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommand) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommand);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommand);
-				}
-			} else {
-				#echo $returnValue['value']." is not ".$outletTriggerTest." ".$outletTriggerValue."\n"; 
-				if ($row['outletStatus'] != $outletTriggerCommandOpposite) {
-					changePort($moduleInfoReturn['moduleAddress'], $row['portNumber'], $outletTriggerCommandOpposite);
-					updateDB($conn, $moduleInfoReturn['id'], $row['portNumber'], $outletTriggerParam, $outletTriggerCommandOpposite);
-				}
-			}
-
 		}
+		# Handle trigger outcome
+		if ($triggered == 1) {
+			$outletState = $outletTriggerCommand;
+			if ($outletStatus != $outletTriggerCommand) {
+				changePort($moduleAddress, $portNumber, $outletTriggerCommand);
+				updateDB($conn, $moduleId, $portNumber, $outletTriggerParam, $outletTriggerCommand);
+			}
+		} else { # NO longer in trigger
+			# Calculate Opposite
+			if (!is_null($onTime) && $currentTimeTimer >= $onTime && $currentTimeTimer < $offTime) {
+				#echo "Current Time: $currentTimeTimer On Time: $onTime\n";
+				$supOn = TRUE;
+			}	
+			if (!is_null($offTime) && ($currentTimeTimer >= $offTime || $currentTimeTimer < $onTime)) {
+				#echo "Current Time: $currentTimeTimer Off Time: $offTime\n";
+				$supOff = TRUE;
+			}
+			if ($alwaysOn == 1 || $supOn) {
+				$outletState = 'ON';
+			} elseif ($supOff) {
+				$outletState = 'OFF';
+			} else {
+
+				$outletState = 'OFF';
+			}
+			if ($outletState != $outletStatus) {
+				changePort($moduleAddress, $portNumber, $outletState);
+				#updateDB($conn, $moduleId, $portNumber, $outletTriggerParam, $outletState);
+			}
+		}
+		#echo "$triggered Param: $outletTriggerParam - Trigger Command: $outletTriggerCommand - True State: $outletState - Outlet Status: $outletStatus - Trigger Val: $outletTriggerTest $outletTriggerValue - Param Value: $paramValue\n";
 	}
 	sleep(1);
   } catch (Exception $e) {
-    echo "Waiting on db and apache to be alive";
+	echo "Waiting on db and apache to be alive";
   }
 }
 ?>

@@ -39,7 +39,19 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 					} else {
 						$note = $portRow['outletNote'];
 					}
-
+					if (is_null($portRow['outletTriggerParam'])) {
+						$portRow['outletTriggerValue'] = '';
+						$portRow['outletTriggerCommand'] = '';
+						$portRow['outletTriggerTest'] = '';
+					}
+					if (!is_null($portRow['on_time']) && !is_null($portRow['off_time'])) { # Turn always off, off
+						$portRow['alwaysOn'] = 0;
+						$alwaysDisabled = 'disabled';
+						$alwaysDisabledText = 'This has been disabled because a time schedule is set below';
+					} else {
+						$alwaysDisabled = '';
+						$alwaysDisabledText = 'Ensure the outlet is on unless epecified above';
+					}
 				?>
                                     <div class="col-lg-2">
 				    <div class="card widget-flat text-center">
@@ -77,20 +89,20 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 									<div class="card">
 									<div class="card-body bg-light">
 									<label for="example-select">IF THE <i class="mdi mdi-arrow-down"></i> </label>
-                                                			<select id="triggerParam" name="triggerParam" class="form-control">
+									<select id="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>triggerParam" name="triggerParam" class="form-control">
                                                     				<option></option>
 									<?php 
 										mysqli_data_seek($parameterListModule, 0);
 										while($pList = $parameterListModule->fetch_assoc()) {
 											if ($pList['id'] == $portRow['outletTriggerParam']) {
-												echo '<option selected value="'.$pList['id'].'">'.$pList['eventName'].'</option>';
+												echo '<option selected value="'.$pList['id'].'">'.str_replace("_", " ", $pList['eventName']).'</option>';
 											} else {
-												echo '<option value="'.$pList['id'].'">'.$pList['eventName'].'</option>';
+												echo '<option value="'.$pList['id'].'">'.str_replace("_", " ", $pList['eventName']).'</option>';
 											}
 										}
 									?>
 									</select>
-                                                			<select id="triggerTest" name="triggerTest" class="form-control">
+									<select id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'];?>triggerTest" name="triggerTest" class="form-control">
 										<option></option>
 									<?php	
 										$possibleTests = array(">:Is greater than", "<:Is less than", "=:Equals", ">=:Is greater than or equal to", "<=:Is less than or equal to");
@@ -104,10 +116,10 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
-								    <input class="mb-1 form-control" type="text" id="triggerValue" name="triggerValue" value="<?php echo $portRow['outletTriggerValue'];?>">
+								    <input class="mb-1 form-control" type="text" id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'];?>triggerValue" name="triggerValue" value="<?php echo $portRow['outletTriggerValue'];?>">
 
 									<label for="example-select">TURN THE OUTLET <i class="mdi mdi-arrow-down"></i></label>
-                                                			<select id="triggerCommand" name="triggerCommand" class="form-control">
+									<select id="<?php echo $portRow['moduleId'];?>-<?php echo $portRow['portNumber'];?>triggerCommand" name="triggerCommand" class="form-control">
 										<option></option>
 									<?php	
 										$possibleCommands = array("On", "Off",);
@@ -168,8 +180,8 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 										}
 									?>
 									</select>
-		                                                    <label class="mt-1" title="Ensure the outlet is on unless specified above">Always On</label>
-                                                			<select id="AOCommand" name="AOCommand" class="form-control">
+									<label class="mt-1" title="<?php echo $alwaysDisabledText;?>">Always On</label>
+									<select title="<?php echo $alwaysDisabledText;?>" <?php echo $alwaysDisabled;?> id="AOCommand" name="AOCommand" class="form-control">
 										<option></option>
 									<?php	
 										$possibleCommands = array("No", "Yes",);
@@ -200,7 +212,7 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 									
                                 		                </div>
 							    <input type="hidden" name="outletId" id="outletId" value="<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>">
-							    <button id="clear_<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>" type="button" class="float-left btn btn-warning mt-2 mb-2">Clear</button>
+							    <button id="clear_<?php echo $portRow['moduleId']?>-<?php echo $portRow['portNumber'];?>" type="button" class="float-left btn btn-warning mt-2 mb-2">Clear All</button>
 							    <button id="submit" type="submit" class="float-right btn btn-secondary mt-2 mb-2">Submit</button>
 							  </div>
 							</form>
@@ -232,6 +244,16 @@ $parameterList2 = $conn->query("SELECT id, eventName from parameter_types ORDER 
 					.removeAttr('checked')
 					.removeAttr('selected')
 				//$('#port'+portInfo[1]).trigger("reset");
+			});
+			$("[id^=clearif_]").click(function() {
+				var idCap = $(this).attr('id');
+				var portInfo = idCap.split("_");
+				$(':input', '#port'+portInfo[1])
+					.not(':button, :submit, :reset, :hidden')
+					$("#triggerParam").removeAttr('selected')
+					$("#triggerTest").removeAttr('selected')
+					$("#triggerCommand").removeAttr('selected')
+					$("#triggerValue").val('')
 			});
 		    </script>
 		    <script src="assets/js/outlets.js"></script>

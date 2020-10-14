@@ -42,11 +42,12 @@ $query = $conn->query("SELECT id,annoColor,decimals FROM parameter_types");
 while ($typeInfo = $query->fetch_array()) {
 	  $arr = [];
 	  $typeID = $typeInfo['id'];
-	  if ($div < 300) { # Don't show annotations on graphs over a week.
+	  if (false) { # Don't show annotations on graphs over a week.
 		  $returnTriggerValue = $conn->query("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE value = 'on' AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC");
 		  $rotate = 0;
 		  while ($value = $returnTriggerValue->fetch_array()) {
-			$returnTriggerValue2 = $conn->query("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE paramId = ".$value['paramId']." AND value = 'off' AND id > ".$value['id']." AND timestamp >= now() - INTERVAL ".$limit." ORDER BY timestamp ASC LIMIT 1");
+			echo("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE paramId = ".$value['paramId']." AND value = 'off' AND id > ".$value['id']." ORDER BY timestamp ASC LIMIT 1\n");
+			$returnTriggerValue2 = $conn->query("SELECT id, value, timestamp, paramId FROM outlet_trigger_entries WHERE paramId = ".$value['paramId']." AND value = 'off' AND id > ".$value['id']." ORDER BY timestamp ASC LIMIT 1");
 			$triggerVal2 = $returnTriggerValue2->fetch_array();
 			$annoQuery = $conn->query("SELECT outlet_entries.outletType FROM outlet_trigger_entries LEFT JOIN outlet_entries ON outlet_trigger_entries.moduleId = outlet_entries.moduleId AND outlet_trigger_entries.outletId = outlet_entries.portNumber WHERE outlet_trigger_entries.id=".$value['id']);
 			$annoColor = $annoQuery->fetch_array();
